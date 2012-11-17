@@ -1,2 +1,11 @@
+.idea/
 *.pyc
 *~
+*.cfgbin/
+share/
+lib/
+include/
+bin/
+build/
+local/
+*.egg-info/
