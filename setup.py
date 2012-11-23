@@ -21,7 +21,7 @@ setup(
         "Natural Language :: English",
         "Operating System :: POSIX :: Linux",
         "Programming Language :: Python :: 2.7",
-        "Topic :: Sfotware Development :: Libraries",
+        "Topic :: Software Development :: Libraries",
         "Topic :: Internet :: WWW/HTTP :: Site Management",
         "Topic :: Utilities",
         "License :: OSI Approved :: MIT License",
