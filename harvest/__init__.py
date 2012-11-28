@@ -17,7 +17,7 @@ from metadata import (
     __version__,
 )
 
-Harvest = __import__('python-harvest')
+from harvest import *
 
 __all__ = [
     '__author__', '__copyright__', '__email__', '__license__',
