@@ -168,8 +168,12 @@ class Harvest(object):
         }
         if 'Authorization' not in self.__headers:
             kwargs['auth'] = (self.email, self.password)
+
         try:
-            return requests.request(**kwargs).json()
+            resp = requests.request(**kwargs)
+            if 'DELETE' not in method:
+                return resp.json()
+            return resp
         except Exception, e:
             raise HarvestError(e)
 
