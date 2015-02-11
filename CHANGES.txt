@@ -1,3 +1,4 @@
 v1.0.1, Nov 10, 2012 -- Initial release.
 v1.0.2, Feb 11, 2015 -- bug fixes
 v1.0.3, Feb 11, 2015 -- pypi fixes
+v1.0.4, Feb 11, 2015 -- DELETE method json fix
