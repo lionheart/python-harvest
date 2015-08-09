@@ -8,7 +8,7 @@ Harvest Time Tracking API Client
 :license: Apache 2.0, see LICENSE for more details.
 """
 
-from metadata import (
+from .metadata import (
     __author__,
     __copyright__,
     __email__,
@@ -17,7 +17,7 @@ from metadata import (
     __version__,
 )
 
-from harvest import *
+from .harvest import *
 
 __all__ = [
     '__author__', '__copyright__', '__email__', '__license__',
