@@ -105,6 +105,27 @@ class Harvest(object):
     def delete_client(self, client_id):
         return self._delete('/clients/{0}'.format(client_id))
 
+    ## Projects
+
+    def projects(self):
+        return self._get('/projects')
+
+    def get_project(self, project_id):
+        return self._get('/projects/{0}'.format(project_id))
+
+    def create_project(self, **kwargs):
+        return self._post('/projects', data=kwargs)
+
+    def update_project(self, project_id, **kwargs):
+        url = '/projects/{0}'.format(project_id)
+        return self._put(url, data=kwargs)
+
+    def toggle_project_active(self, project_id):
+        return self._put('/projects/{0}/toggle'.format(project_id))
+
+    def delete_project(self, project_id):
+        return self._delete('/projects/{0}'.format(project_id))
+
     ## Expense Categories
 
     @property
