@@ -7,6 +7,7 @@
 """
 
 import requests
+from requests_oauthlib import OAuth2Session
 from urlparse import urlparse
 from base64   import b64encode as enc64
 
@@ -16,29 +17,45 @@ class HarvestError(Exception):
     pass
 
 class Harvest(object):
-    def __init__(self, uri, email, password, put_auth_in_header=True):
+    def __init__(self, uri, email=None, password=None, client_id=None, token=None, put_auth_in_header=True):
         self.__uri      = uri.rstrip('/')
         parsed = urlparse(uri)
         if not (parsed.scheme and parsed.netloc):
             raise HarvestError('Invalid harvest uri "{0}".'.format(uri))
-        self.__email    = email.strip()
-        self.__password = password
+
         self.__headers = {
             'Accept'        : 'application/json',
             'User-Agent'    : 'Mozilla/5.0',  # 'TimeTracker for Linux' -- ++ << >>
         }
-        if put_auth_in_header:
-            self.__headers['Authorization'] = 'Basic {0}'.format(enc64('{self.email}:{self.password}'.format(self=self)))
+        if email and password:
+            self.__auth     = 'Basic'
+            self.__email    = email.strip()
+            self.__password = password
+            if put_auth_in_header:
+                self.__headers['Authorization'] = 'Basic {0}'.format(enc64('{self.email}:{self.password}'.format(self=self)))
+        elif client_id and token:
+            self.__auth         = 'OAuth2'
+            self.__client_id    = client_id
+            self.__token = token
 
     @property
     def uri(self):
         return self.__uri
+    @property
+    def auth(self):
+        return self.__auth
     @property
     def email(self):
         return self.__email
     @property
     def password(self):
         return self.__password
+    @property
+    def client_id(self):
+        return self.__client_id
+    @property
+    def token(self):
+        return self.__token
 
     @property
     def status(self):
@@ -187,11 +204,15 @@ class Harvest(object):
             'headers' : self.__headers,
             'data'    : data,
         }
-        if 'Authorization' not in self.__headers:
-            kwargs['auth'] = (self.email, self.password)
+        if self.auth == 'Basic':
+            requestor = requests
+            if 'Authorization' not in self.__headers:
+                kwargs['auth'] = (self.email, self.password)
+        elif self.auth == 'OAuth2':
+            requestor = OAuth2Session(client_id=self.client_id, token=self.token)
 
         try:
-            resp = requests.request(**kwargs)
+            resp = requestor.request(**kwargs)
             if 'DELETE' not in method:
                 return resp.json()
             return resp
