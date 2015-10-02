@@ -122,6 +122,22 @@ class Harvest(object):
     def delete_client(self, client_id):
         return self._delete('/clients/{0}'.format(client_id))
 
+
+     ## People
+
+    def people(self):
+        url = '/people'
+        return self._get(url)
+
+    def get_person(self, person_id):
+        return self._get('/people/{0}'.format(person_id))
+
+    def toggle_person_active(self, client_id):
+        return self._get('/people/{0}/toggle'.format(people_id))
+
+    def delete_client(self, client_id):
+        return self._delete('/people/{0}'.format(person_id))
+
     ## Projects
 
     def projects(self):
