@@ -135,7 +135,7 @@ class Harvest(object):
     def toggle_person_active(self, client_id):
         return self._get('/people/{0}/toggle'.format(people_id))
 
-    def delete_client(self, client_id):
+    def delete_person(self, client_id):
         return self._delete('/people/{0}'.format(person_id))
 
     ## Projects
