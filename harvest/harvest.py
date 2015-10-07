@@ -143,6 +143,9 @@ class Harvest(object):
     def projects(self):
         return self._get('/projects')
 
+    def projects_for_client(self, client_id):
+        return self._get('/projects?client={}'.format(client_id))
+
     def get_project(self, project_id):
         return self._get('/projects/{0}'.format(project_id))
 
