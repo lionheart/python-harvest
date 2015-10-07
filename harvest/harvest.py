@@ -146,6 +146,14 @@ class Harvest(object):
     def projects_for_client(self, client_id):
         return self._get('/projects?client={}'.format(client_id))
 
+    def timesheets_for_project(self, project_id, start_date, end_date):
+        return self._get('/projects/{0}/entries?from={1}&to={2}'
+                         .format(project_id, start_date, end_date))
+
+    def expenses_for_project(self, project_id, start_date, end_date):
+        return self._get('/projects/{0}/expenses?from={1}&to={2}'
+                         .format(project_id, start_date, end_date))
+
     def get_project(self, project_id):
         return self._get('/projects/{0}'.format(project_id))
 
