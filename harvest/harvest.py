@@ -6,8 +6,9 @@
 
 """
 
-import urllib2
 import json
+import requests
+from requests_oauthlib import OAuth2Session
 from urlparse import urlparse
 from base64   import b64encode as enc64
 
@@ -136,7 +137,12 @@ class Harvest(object):
 
     ## Projects
 
-    def projects(self):
+    def projects(self, client=None):
+        if client:
+            # You can filter by client_id and updated_since.
+            # For example to show only the projects belonging to client with the id 23445.
+            # GET /projects?client=23445
+            return self._get('/projects?client={0}'.format(client))
         return self._get('/projects')
 
     def get_project(self, project_id):
@@ -163,12 +169,14 @@ class Harvest(object):
     def get_tasks(self, task_id):
         return self._get('/tasks/{0}'.format(task_id))
 
-    def create_task(self, **kwargs):
+    def create_tasks(self, **kwargs):
         # CREATE NEW TASK
-        return self._post('/tasks/', **kwargs)
+        # client.create_task(task={"name":"jo"})
+        return self._post('/tasks/', data=kwargs)
 
     def update_task(self, tasks_id, **kwargs):
         # UPDATE AN EXISTING TASK
+        # client.update_task(task_id, task={"name": "jo"})
         url = '/tasks/{0}'.format(tasks_id)
         return self._put(url, data=kwargs)
 
@@ -193,10 +201,9 @@ class Harvest(object):
     # ASSIGN A TASK TO A PROJECT
     # POST /projects/#{project_id}/task_assignments
 
-    def create_tasks_to_project(self, project_id, name, **kwargs):
+    def create_tasks_to_project(self, project_id, **kwargs):
         # CREATE A NEW TASK AND ASSIGN IT TO A PROJECT
         # POST /projects/#{project_id}/task_assignments/add_with_create_new_task
-        kwargs.update({'name': name})
         return self._post('/projects/{0}/task_assignments/add_with_create_new_task'.format(project_id), kwargs)
 
     # REMOVING A TASK FROM A PROJECT
@@ -264,29 +271,36 @@ class Harvest(object):
         return self._request('DELETE', path, data)
 
     def _request(self, method='GET', path='/', data=None):
+        url = '{self.uri}{path}'.format(self=self, path=path)
+        kwargs = {
+            'method'  : method,
+            'url'     : '{self.uri}{path}'.format(self=self, path=path),
+            'headers' : self.__headers,
+            'data'   : json.dumps(data),
+        }
+        if self.auth == 'Basic':
+            requestor = requests
+            if 'Authorization' not in self.__headers:
+                kwargs['auth'] = (self.email, self.password)
+        elif self.auth == 'OAuth2':
+            requestor = OAuth2Session(client_id=self.client_id, token=self.token)
+
         try:
-            print data
-            print path
-            print self
-            req = urllib2.Request('{self.uri}{path}'.format(self=self, path=path), data=data, headers=self.__headers)
-            print req
-            resp = urllib2.urlopen(req)
-            print resp
+            # print kwargs
+            resp = requestor.request(**kwargs)
             if 'DELETE' not in method:
                 try:
-                    return json.loads(resp.read())
+                    return resp.json()
                 except:
                     return resp
             return resp
         except Exception, e:
-            print 'errrororrrr'
-            print e
             raise HarvestError(e)
 
 
 def status():
     try:
-        status = json.loads(urllib2.urlopen(HARVEST_STATUS_URL).read()).get('status', {})
+        status = requests.get(HARVEST_STATUS_URL).json().get('status', {})
     except:
         status = {}
     return status
