@@ -163,7 +163,10 @@ class Harvest(object):
 
     ## Tasks
 
-    def tasks(self):
+    def tasks(self, updated_since=None):
+        # /tasks?updated_since=2010-09-25+18%3A30
+        if updated_since:
+            return self._get('/tasks?updated_since={0}'.format(updated_since))
         return self._get('/tasks')
 
     def get_tasks(self, task_id):
@@ -201,14 +204,15 @@ class Harvest(object):
     # ASSIGN A TASK TO A PROJECT
     # POST /projects/#{project_id}/task_assignments
 
-    def create_tasks_to_project(self, project_id, **kwargs):
+    def create_task_to_project(self, project_id, **kwargs):
         # CREATE A NEW TASK AND ASSIGN IT TO A PROJECT
         # POST /projects/#{project_id}/task_assignments/add_with_create_new_task
         return self._post('/projects/{0}/task_assignments/add_with_create_new_task'.format(project_id), kwargs)
 
-    # REMOVING A TASK FROM A PROJECT
-    # DELETE /projects/#{project_id}/task_assignments/#{task_assignment_id}
-    #
+    def remove_task_from_project(self, project_id, task_id):
+        # REMOVING A TASK FROM A PROJECT
+        # DELETE /projects/#{project_id}/task_assignments/#{task_assignment_id}
+        return self._delete('/projects/{0}/task_assignments/{1}'.format(project_id, task_id))
     #
     # CHANGING A TASK FOR A PROJECT
     # PUT /projects/#{project_id}/task_assignments/#{task_assignment_id}
