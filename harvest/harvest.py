@@ -195,11 +195,15 @@ class Harvest(object):
 
     ## Task Assignment: Assigning tasks to projects
 
-    # GET ALL TASKS ASSIGNED TO A GIVEN PROJECT
-    # /projects/#{project_id}/task_assignments
+    def get_all_tasks_from_project(self, project_id):
+        # GET ALL TASKS ASSIGNED TO A GIVEN PROJECT
+        # /projects/#{project_id}/task_assignments
+        return self._get('/projects/{0}/task_assignments'.format(project_id))
 
-    # GET ONE TASK ASSIGNMENT
-    # GET /projects/#{project_id}/task_assignments/#{task_assignment_id}
+    def get_one_task_assigment(self, project_id, task_id):
+        # GET ONE TASK ASSIGNMENT
+        # GET /projects/#{project_id}/task_assignments/#{task_assignment_id}
+        return self._get('/projects/{0}/task_assignments/{1}'.format(project_id, task_id))
 
     # ASSIGN A TASK TO A PROJECT
     # POST /projects/#{project_id}/task_assignments
