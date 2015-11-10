@@ -27,9 +27,6 @@ class Harvest(object):
             raise HarvestError('Invalid harvest uri "{0}".'.format(uri))
 
         self.__headers = {
-            # 'Accept': 'application/xml',
-            # 'Content-Type': 'application/xml',
-            # 'User-Agent': 'harvest.py',
             'Content-Type'  : 'application/json',
             'Accept'        : 'application/json',
             'User-Agent'    : 'Mozilla/5.0',  # 'TimeTracker for Linux' -- ++ << >>
@@ -120,9 +117,8 @@ class Harvest(object):
         return self._get('/clients/{0}'.format(client_id))
 
     def create_client(self, new_client_id, name, **kwargs):
-        # url  = '/clients/{0}'.format(new_client_id)
         url = '/clients/'
-        kwargs.update({'name':name})
+        kwargs.update({'name': name})
         return self._post(url, data=kwargs)
 
     def update_client(self, client_id, **kwargs):
@@ -294,7 +290,6 @@ class Harvest(object):
             requestor = OAuth2Session(client_id=self.client_id, token=self.token)
 
         try:
-            # print kwargs
             resp = requestor.request(**kwargs)
             if 'DELETE' not in method:
                 try:
