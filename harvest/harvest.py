@@ -165,10 +165,10 @@ class Harvest(object):
             return self._get('/tasks?updated_since={0}'.format(updated_since))
         return self._get('/tasks')
 
-    def get_tasks(self, task_id):
+    def get_task(self, task_id):
         return self._get('/tasks/{0}'.format(task_id))
 
-    def create_tasks(self, **kwargs):
+    def create_task(self, **kwargs):
         # CREATE NEW TASK
         # client.create_task(task={"name":"jo"})
         return self._post('/tasks/', data=kwargs)
@@ -187,7 +187,7 @@ class Harvest(object):
 
     def activate_task(self, tasks_id):
         # ACTIVATE EXISTING ARCHIVED TASK
-        return self._delete('/tasks/{0}/activate'.format(tasks_id))
+        return self._post('/tasks/{0}/activate'.format(tasks_id))
 
     ## Task Assignment: Assigning tasks to projects
 
@@ -201,8 +201,10 @@ class Harvest(object):
         # GET /projects/#{project_id}/task_assignments/#{task_assignment_id}
         return self._get('/projects/{0}/task_assignments/{1}'.format(project_id, task_id))
 
-    # ASSIGN A TASK TO A PROJECT
-    # POST /projects/#{project_id}/task_assignments
+    def assign_task_to_project(self, project_id, **kwargs):
+        # ASSIGN A TASK TO A PROJECT
+        # POST /projects/#{project_id}/task_assignments
+        return self._post('/projects/{0}/task_assignments/'.format(project_id), kwargs)
 
     def create_task_to_project(self, project_id, **kwargs):
         # CREATE A NEW TASK AND ASSIGN IT TO A PROJECT
@@ -213,9 +215,12 @@ class Harvest(object):
         # REMOVING A TASK FROM A PROJECT
         # DELETE /projects/#{project_id}/task_assignments/#{task_assignment_id}
         return self._delete('/projects/{0}/task_assignments/{1}'.format(project_id, task_id))
-    #
-    # CHANGING A TASK FOR A PROJECT
-    # PUT /projects/#{project_id}/task_assignments/#{task_assignment_id}
+
+    def change_task_from_project(self, project_id, task_id, data, **kwargs):
+        # CHANGING A TASK FOR A PROJECT
+        # PUT /projects/#{project_id}/task_assignments/#{task_assignment_id}
+        kwargs.update({'task-assignment': data})
+        return self._put('/projects/{0}/task_assignments/{1}'.format(project_id, task_id), kwargs)
 
     ## Expense Categories
 
