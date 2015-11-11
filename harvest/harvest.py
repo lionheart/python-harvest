@@ -126,7 +126,7 @@ class Harvest(object):
         return self._put(url, data=kwargs)
 
     def toggle_client_active(self, client_id):
-        return self._get('/clients/{0}/toggle'.format(client_id))
+        return self._post('/clients/{0}/toggle'.format(client_id))
 
     def delete_client(self, client_id):
         return self._delete('/clients/{0}'.format(client_id))
