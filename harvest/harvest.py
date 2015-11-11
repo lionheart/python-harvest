@@ -116,9 +116,9 @@ class Harvest(object):
     def get_client(self, client_id):
         return self._get('/clients/{0}'.format(client_id))
 
-    def create_client(self, new_client_id, name, **kwargs):
+    def create_client(self, **kwargs):
         url = '/clients/'
-        kwargs.update({'name': name})
+        # client.create_client(client={"name":"jo"})
         return self._post(url, data=kwargs)
 
     def update_client(self, client_id, **kwargs):
@@ -126,7 +126,7 @@ class Harvest(object):
         return self._put(url, data=kwargs)
 
     def toggle_client_active(self, client_id):
-        return self._get('/clients/{0}/toggle'.format(client_id))
+        return self._post('/clients/{0}/toggle'.format(client_id))
 
     def delete_client(self, client_id):
         return self._delete('/clients/{0}'.format(client_id))
@@ -145,6 +145,7 @@ class Harvest(object):
         return self._get('/projects/{0}'.format(project_id))
 
     def create_project(self, **kwargs):
+        # Example: client.create_project(project={"name": title, "client_id": client_id})
         return self._post('/projects', data=kwargs)
 
     def update_project(self, project_id, **kwargs):
