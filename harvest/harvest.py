@@ -296,7 +296,7 @@ class Harvest(object):
             'method'  : method,
             'url'     : '{self.uri}{path}'.format(self=self, path=path),
             'headers' : self.__headers,
-            'data'   : data,
+            'data'   : json.dumps(data),
         }
         if self.auth == 'Basic':
             requestor = requests
