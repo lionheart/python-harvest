@@ -285,7 +285,7 @@ class Harvest(object):
         return self._get('/people')
 
     def userfilter(self, user_id):
-        return self._get('/people?of_user={0}'.format(user_id))
+        return self._get('/people/{0}'.format(user_id))
 
     def user_hours(self, user_id, start, stop):
         return self._get('/people/{0}/entries?from={1}&to={2}'.format(user_id,start,stop))
