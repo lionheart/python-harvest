@@ -297,11 +297,9 @@ class Harvest(object):
 
         try:
             resp = requestor.request(**kwargs)
+            # return full response to see headers, do .json yourself if needed.
             if 'DELETE' not in method:
-                try:
-                    return resp.json()
-                except:
-                    return resp
+                return resp
             return resp
         except Exception, e:
             raise HarvestError(e)
