@@ -312,7 +312,7 @@ class Harvest(object):
                     return resp.json()
                 except:
                     return resp.json()
-            return resp.json()
+            return resp
         except Exception, e:
             raise HarvestError(e)
 
