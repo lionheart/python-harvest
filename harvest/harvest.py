@@ -223,6 +223,13 @@ class Harvest(object):
         kwargs.update({'task-assignment': data})
         return self._put('/projects/{0}/task_assignments/{1}'.format(project_id, task_id), kwargs)
 
+    ## User Assignment: Assigning users to projects
+
+    def assign_user_to_project(self, project_id, user_id):
+        # ASSIGN A USER TO A PROJECT
+        # POST /projects/#{project_id}/user_assignments
+        return self._post('/projects/{0}/user_assignments'.format(project_id), {"user": {"id": user_id}})
+
     ## Expense Categories
 
     @property
@@ -261,6 +268,9 @@ class Harvest(object):
 
     def add(self, data):
         return self._post('/daily/add', data)
+
+    def add_for_user(self, user_id, data):
+        return self._post('/daily/add?of_user={0}'.format(user_id), data)
 
     def delete(self, entry_id):
         return self._delete('/daily/delete/{0}'.format(entry_id))
