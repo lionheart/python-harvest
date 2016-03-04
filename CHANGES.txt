@@ -4,6 +4,9 @@ Changelog
 v1.0.5(unreleased)
 -------------------
 
+- Added people end point into the lib.
+  [bwghughes]
+
 - Added possibility to assign users to projects and add time entries for a specific user
   [casdr]
 
