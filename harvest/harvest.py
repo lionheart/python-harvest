@@ -131,6 +131,22 @@ class Harvest(object):
     def delete_client(self, client_id):
         return self._delete('/clients/{0}'.format(client_id))
 
+
+     ## People
+
+    def people(self):
+        url = '/people'
+        return self._get(url)
+
+    def get_person(self, person_id):
+        return self._get('/people/{0}'.format(person_id))
+
+    def toggle_person_active(self, client_id):
+        return self._get('/people/{0}/toggle'.format(people_id))
+
+    def delete_person(self, client_id):
+        return self._delete('/people/{0}'.format(person_id))
+
     ## Projects
 
     def projects(self, client=None):
@@ -140,6 +156,17 @@ class Harvest(object):
             # GET /projects?client=23445
             return self._get('/projects?client={0}'.format(client))
         return self._get('/projects')
+
+    def projects_for_client(self, client_id):
+        return self._get('/projects?client={}'.format(client_id))
+
+    def timesheets_for_project(self, project_id, start_date, end_date):
+        return self._get('/projects/{0}/entries?from={1}&to={2}'
+                         .format(project_id, start_date, end_date))
+
+    def expenses_for_project(self, project_id, start_date, end_date):
+        return self._get('/projects/{0}/expenses?from={1}&to={2}'
+                         .format(project_id, start_date, end_date))
 
     def get_project(self, project_id):
         return self._get('/projects/{0}'.format(project_id))
