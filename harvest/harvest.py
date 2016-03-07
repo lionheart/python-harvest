@@ -311,7 +311,7 @@ class Harvest(object):
                 try:
                     return resp.json()
                 except:
-                    return resp.json()
+                    return resp
             return resp
         except Exception, e:
             raise HarvestError(e)
