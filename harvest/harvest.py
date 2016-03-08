@@ -1,11 +1,3 @@
-"""
- harvest.py
-
- Author: Jonathan Hosmer (forked from https://github.com/lionheart/python-harvest.git)
- Date: Sat Jan 31 12:17:16 2015
-
-"""
-
 import json
 import requests
 from requests_oauthlib import OAuth2Session

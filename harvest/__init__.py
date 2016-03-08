@@ -4,8 +4,8 @@
 Harvest Time Tracking API Client
 ~~~~~~~~~~~~~~~~
 
-:copyright: © 2012 Aurora Software LLC
-:license: Apache 2.0, see LICENSE for more details.
+:copyright: © 2012 Alex Goretoy
+:license: MIT License, see LICENSE.txt for more details.
 """
 
 from .metadata import (
