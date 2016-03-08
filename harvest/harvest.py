@@ -17,6 +17,7 @@ class Harvest(object):
         parsed = urlparse(uri)
         if not (parsed.scheme and parsed.netloc):
             raise HarvestError('Invalid harvest uri "{0}".'.format(uri))
+            
         if refresh_token:
             self.__headers = {
                 "Content-Type": 'application/x-www-form-urlencoded',
@@ -26,6 +27,7 @@ class Harvest(object):
             self.__headers = {
                 'Content-Type'  : 'application/json',
                 'Accept'        : 'application/json',
+                'User-Agent'    : 'Mozilla/5.0',  # 'TimeTracker for Linux' -- ++ << >>
             }
         if email and password:
             self.__auth     = 'Basic'
