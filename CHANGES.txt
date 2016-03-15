@@ -4,6 +4,8 @@ Changelog
 v1.1.0(unreleased)
 -------------------
 
+- Task assignment: dash to underscore
+  [casdr]
 - Removed JSON unserialize
   [casdr]
 
