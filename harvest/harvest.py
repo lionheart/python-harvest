@@ -131,6 +131,22 @@ class Harvest(object):
     def delete_client(self, client_id):
         return self._delete('/clients/{0}'.format(client_id))
 
+
+     ## People
+
+    def people(self):
+        url = '/people'
+        return self._get(url)
+
+    def get_person(self, person_id):
+        return self._get('/people/{0}'.format(person_id))
+
+    def toggle_person_active(self, client_id):
+        return self._get('/people/{0}/toggle'.format(people_id))
+
+    def delete_person(self, client_id):
+        return self._delete('/people/{0}'.format(person_id))
+
     ## Projects
 
     def projects(self, client=None):
@@ -140,6 +156,17 @@ class Harvest(object):
             # GET /projects?client=23445
             return self._get('/projects?client={0}'.format(client))
         return self._get('/projects')
+
+    def projects_for_client(self, client_id):
+        return self._get('/projects?client={}'.format(client_id))
+
+    def timesheets_for_project(self, project_id, start_date, end_date):
+        return self._get('/projects/{0}/entries?from={1}&to={2}'
+                         .format(project_id, start_date, end_date))
+
+    def expenses_for_project(self, project_id, start_date, end_date):
+        return self._get('/projects/{0}/expenses?from={1}&to={2}'
+                         .format(project_id, start_date, end_date))
 
     def get_project(self, project_id):
         return self._get('/projects/{0}'.format(project_id))
@@ -223,6 +250,13 @@ class Harvest(object):
         kwargs.update({'task-assignment': data})
         return self._put('/projects/{0}/task_assignments/{1}'.format(project_id, task_id), kwargs)
 
+    ## User Assignment: Assigning users to projects
+
+    def assign_user_to_project(self, project_id, user_id):
+        # ASSIGN A USER TO A PROJECT
+        # POST /projects/#{project_id}/user_assignments
+        return self._post('/projects/{0}/user_assignments'.format(project_id), {"user": {"id": user_id}})
+
     ## Expense Categories
 
     @property
@@ -261,6 +295,9 @@ class Harvest(object):
 
     def add(self, data):
         return self._post('/daily/add', data)
+
+    def add_for_user(self, user_id, data):
+        return self._post('/daily/add?of_user={0}'.format(user_id), data)
 
     def delete(self, entry_id):
         return self._delete('/daily/delete/{0}'.format(entry_id))
