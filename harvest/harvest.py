@@ -247,7 +247,7 @@ class Harvest(object):
     def change_task_from_project(self, project_id, task_id, data, **kwargs):
         # CHANGING A TASK FOR A PROJECT
         # PUT /projects/#{project_id}/task_assignments/#{task_assignment_id}
-        kwargs.update({'task-assignment': data})
+        kwargs.update({'task_assignment': data})
         return self._put('/projects/{0}/task_assignments/{1}'.format(project_id, task_id), kwargs)
 
     ## User Assignment: Assigning users to projects
@@ -334,11 +334,9 @@ class Harvest(object):
 
         try:
             resp = requestor.request(**kwargs)
+            # return full response to see headers, do .json yourself if needed.
             if 'DELETE' not in method:
-                try:
-                    return resp.json()
-                except:
-                    return resp
+                return resp
             return resp
         except Exception, e:
             raise HarvestError(e)
