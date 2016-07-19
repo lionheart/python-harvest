@@ -9,11 +9,10 @@ def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
 setup(
-    name='python-harvest',
+    name='python-harvest-redux',
     version=read('VERSION'),
-    description="Harvest api client",
+    description="Harvest API client",
     long_description=read('README'),
-    # http://pypi.python.org/pypi?:action=list_classifiers
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Environment :: Console",
@@ -25,7 +24,7 @@ setup(
         "Topic :: Internet :: WWW/HTTP :: Site Management",
         "Topic :: Utilities",
         "License :: OSI Approved :: MIT License",
-        ],
+    ],
     keywords='harvestapp timetracking api',
     author='Alex Goretoy',
     author_email='alex@goretoy.com',
