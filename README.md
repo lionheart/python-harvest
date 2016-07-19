@@ -35,6 +35,16 @@ client = harvest.Harvest("https://COMPANYNAME.harvestapp.com", client_id=client_
 client.who_am_i
 ```
 
+### Contributions
+
+Contributions are welcome. Please submit a pull request and make sure you adhere to PEP-8 coding guidelines. I'll review your patch and will accept if it looks good.
+
+### TODOs
+
+* [ ] Tests
+* [ ] Full OAuth workflow
+* [ ] More documentation
+
 ### License
 
 See [LICENSE](LICENSE).
