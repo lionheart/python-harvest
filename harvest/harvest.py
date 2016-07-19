@@ -1,11 +1,3 @@
-"""
- harvest.py
-
- Author: Jonathan Hosmer (forked from https://github.com/lionheart/python-harvest.git)
- Date: Sat Jan 31 12:17:16 2015
-
-"""
-
 import json
 import requests
 from requests_oauthlib import OAuth2Session
@@ -20,17 +12,23 @@ class HarvestError(Exception):
 
 
 class Harvest(object):
-    def __init__(self, uri, email=None, password=None, client_id=None, token=None, put_auth_in_header=True):
+    def __init__(self, uri, email=None, password=None, refresh_token=None, client_id=None, token=None, put_auth_in_header=True):
         self.__uri = uri.rstrip('/')
         parsed = urlparse(uri)
         if not (parsed.scheme and parsed.netloc):
             raise HarvestError('Invalid harvest uri "{0}".'.format(uri))
-
-        self.__headers = {
-            'Content-Type'  : 'application/json',
-            'Accept'        : 'application/json',
-            'User-Agent'    : 'Mozilla/5.0',  # 'TimeTracker for Linux' -- ++ << >>
-        }
+            
+        if refresh_token:
+            self.__headers = {
+                "Content-Type": 'application/x-www-form-urlencoded',
+                "Accept": 'application/json',
+            }
+        else:
+            self.__headers = {
+                'Content-Type'  : 'application/json',
+                'Accept'        : 'application/json',
+                'User-Agent'    : 'Mozilla/5.0',  # 'TimeTracker for Linux' -- ++ << >>
+            }
         if email and password:
             self.__auth     = 'Basic'
             self.__email    = email.strip()
@@ -40,7 +38,7 @@ class Harvest(object):
         elif client_id and token:
             self.__auth         = 'OAuth2'
             self.__client_id    = client_id
-            self.__token = token
+            self.__token        = token
 
     @property
     def uri(self):
@@ -284,6 +282,9 @@ class Harvest(object):
     def today(self):
         return self._get('/daily')
 
+    def today_user(self, user_id):
+        return self._get('/daily?of_user={0}'.format(user_id))
+
     def get_day(self, day_of_the_year=1, year=2012):
         return self._get('/daily/{0}/{1}'.format(day_of_the_year, year))
 
@@ -316,6 +317,17 @@ class Harvest(object):
 
     def _delete(self, path='/', data=None):
         return self._request('DELETE', path, data)
+
+    # users
+    @property
+    def users(self):
+        return self._get('/people')
+
+    def userfilter(self, user_id):
+        return self._get('/people/{0}'.format(user_id))
+
+    def user_hours(self, user_id, start, stop):
+        return self._get('/people/{0}/entries?from={1}&to={2}'.format(user_id,start,stop))
 
     def _request(self, method='GET', path='/', data=None):
         url = '{self.uri}{path}'.format(self=self, path=path)
