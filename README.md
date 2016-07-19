@@ -41,4 +41,4 @@ See [LICENSE](LICENSE).
 
 ### Authors
 
-See [AUTHORS](AUTHORS.md).
+See [AUTHORS](AUTHORS).
