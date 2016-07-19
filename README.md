@@ -33,7 +33,7 @@ token = {
 }
 ```
 
-For information on how to get intial tokens see: https://github.com/harvesthq/api/blob/master/Authentication/OAuth%202.0.md
+For information on how to get initial tokens see: https://github.com/harvesthq/api/blob/master/Authentication/OAuth%202.0.md
 
 ```python
 import harvest
