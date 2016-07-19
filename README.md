@@ -28,3 +28,11 @@ import harvest
 client = harvest.Harvest("https://COMPANYNAME.harvestapp.com", client_id=client_id, token=token)
 client.who_am_i
 ```
+
+### License
+
+See [LICENSE](LICENSE).
+
+### Authors
+
+See [AUTHORS](AUTHORS.md).
