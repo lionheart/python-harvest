@@ -47,7 +47,7 @@ Contributions are welcome. Please submit a pull request and make sure you adhere
 
 ### License
 
-See [LICENSE](LICENSE).
+python-harvest is licensed under Apache 2.0. See [LICENSE](LICENSE) for more details.
 
 ### Authors
 
