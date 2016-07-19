@@ -1,5 +1,11 @@
 # Python Harvest API Client
 
+### Installation
+
+```
+pip install python-harvest-redux
+```
+
 ### Usage
 
 ```python
