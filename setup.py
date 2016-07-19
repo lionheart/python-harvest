@@ -16,7 +16,7 @@ def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
 metadata = {}
-execfile("bigstore/metadata.py", metadata)
+execfile("harvest/metadata.py", metadata)
 
 classifiers = [
     "Development Status :: 5 - Production/Stable",
@@ -35,7 +35,7 @@ setup(
     name='python-harvest-redux',
     version=metadata['__version__'],
     description="Harvest API client",
-    long_description="Harvest Time Tracking API Client"
+    long_description="Harvest Time Tracking API Client",
     classifiers=classifiers,
     keywords='harvestapp timetracking api',
     author=metadata['__author__'],
