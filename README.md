@@ -4,6 +4,7 @@ Python Harvest API Client
 ![Version](https://img.shields.io/pypi/v/python-harvest-redux.svg?style=flat)
 ![License](https://img.shields.io/pypi/l/python-harvest-redux.svg?style=flat)
 ![Versions](https://img.shields.io/pypi/pyversions/python-harvest-redux.svg?style=flat)
+![Tests](https://img.shields.io/travis/lionheart/python-harvest.svg?style=flat)
 
 ### Installation
 
