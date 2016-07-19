@@ -1,7 +1,7 @@
 Changelog
 =========
 
-v1.0.5(unreleased)
+v1.0.5
 -------------------
 
 - Added people end point into the lib.
