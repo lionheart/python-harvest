@@ -18,6 +18,7 @@ def read(fname):
 metadata = {}
 execfile("harvest/metadata.py", metadata)
 
+# http://pypi.python.org/pypi?:action=list_classifiers
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Environment :: Console",
@@ -26,9 +27,8 @@ classifiers = [
     "Operating System :: POSIX :: Linux",
     "Programming Language :: Python :: 2.7",
     "Topic :: Software Development :: Libraries",
-    "Topic :: Internet :: WWW/HTTP :: Site Management",
     "Topic :: Utilities",
-    "License :: OSI Approved :: MIT License",
+    "License :: OSI Approved :: Apache Software License",
 ]
 
 setup(
