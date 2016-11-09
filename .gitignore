@@ -10,3 +10,5 @@ build/
 local/
 *.egg-info/
 dist/
+.cache/
+tests/*.json

@@ -12,33 +12,30 @@ class HarvestError(Exception):
 
 
 class Harvest(object):
-    def __init__(self, uri, email=None, password=None, refresh_token=None, client_id=None, token=None, put_auth_in_header=True):
+    def __init__(self, uri, email=None, password=None, client_id=None,
+                 token=None, put_auth_in_header=True, client_secret=None):
         self.__uri = uri.rstrip('/')
         parsed = urlparse(uri)
         if not (parsed.scheme and parsed.netloc):
             raise HarvestError('Invalid harvest uri "{0}".'.format(uri))
-            
-        if refresh_token:
-            self.__headers = {
-                "Content-Type": 'application/x-www-form-urlencoded',
-                "Accept": 'application/json',
-            }
-        else:
-            self.__headers = {
-                'Content-Type'  : 'application/json',
-                'Accept'        : 'application/json',
-                'User-Agent'    : 'Mozilla/5.0',  # 'TimeTracker for Linux' -- ++ << >>
-            }
+
+        self.__headers = {
+            'Content-Type' : 'application/json',
+            'Accept' : 'application/json',
+            'User-Agent' : 'Mozilla/5.0',  # 'TimeTracker for Linux' -- ++ << >>
+        }
         if email and password:
-            self.__auth     = 'Basic'
-            self.__email    = email.strip()
+            self.__auth = 'Basic'
+            self.__email = email.strip()
             self.__password = password
             if put_auth_in_header:
-                self.__headers['Authorization'] = 'Basic {0}'.format(enc64('{self.email}:{self.password}'.format(self=self)))
+                self.__headers['Authorization'] = 'Basic {0}'.format(
+                    enc64('{self.email}:{self.password}'.format(self=self)))
         elif client_id and token:
-            self.__auth         = 'OAuth2'
-            self.__client_id    = client_id
-            self.__token        = token
+            self.__auth = 'OAuth2'
+            self.__client_id = client_id
+            self.__client_secret = client_secret
+            self.__token = token
 
     @property
     def uri(self):
@@ -59,6 +56,10 @@ class Harvest(object):
     @property
     def client_id(self):
         return self.__client_id
+
+    @property
+    def client_secret(self):
+        return self.__client_secret
 
     @property
     def token(self):
@@ -330,22 +331,34 @@ class Harvest(object):
         return self._get('/people/{0}/entries?from={1}&to={2}'.format(user_id,start,stop))
 
     def _request(self, method='GET', path='/', data=None):
-        url = '{self.uri}{path}'.format(self=self, path=path)
         kwargs = {
-            'method'  : method,
-            'url'     : '{self.uri}{path}'.format(self=self, path=path),
-            'headers' : self.__headers,
-            'data'   : json.dumps(data),
+            'method': method,
+            'url': '{self.uri}{path}'.format(self=self, path=path),
+            'headers': self.__headers,
+            'data': json.dumps(data),
         }
         if self.auth == 'Basic':
             requestor = requests
             if 'Authorization' not in self.__headers:
                 kwargs['auth'] = (self.email, self.password)
         elif self.auth == 'OAuth2':
-            requestor = OAuth2Session(client_id=self.client_id, token=self.token)
-
+            requestor = OAuth2Session(
+                client_id=self.client_id,
+                token=self.token,
+            )
         try:
             resp = requestor.request(**kwargs)
+            # If token has expired, try to automatically refresh it and
+            # retry the request.
+            if self.auth == 'OAuth2' and resp.status_code == 401:
+                refresh_url = '{}/oauth2/token'.format(self.uri)
+                token = requestor.refresh_token(refresh_url,
+                    client_id=self.client_id, client_secret=self.client_secret)
+                if token:
+                    self.__token = token
+                # Retry response
+                resp = requestor.request(**kwargs)
+
             if 'DELETE' not in method:
                 try:
                     return resp.json()
