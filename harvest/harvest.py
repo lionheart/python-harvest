@@ -295,6 +295,35 @@ class Harvest(object):
     def toggle_expense_category_active(self, expense_category_id):
         return self._get('/expense_categories/{0}/toggle'.format(expense_category_id))
 
+    ## Invoices
+
+    def invoices(self, page=1, updated_since=None, status=None, from_date=None, to_date=None, client=None):
+        url = '/invoices?page={0}'.format(page)
+        if updated_since is not None:
+            url = '{0}&updated_since={1}'.format(url, updated_since)
+        if status is not None:
+            url = '{0}&status={1}'.format(url, status)
+        if from_date is not None:
+            url = '{0}&from={1}'.format(url, from_date)
+        if to_date is not None:
+            url = '{0}&to={1}'.format(url, to_date)
+        if client is not None:
+            url = '{0}&client={1}'.format(url, client)
+        return self._get(url)
+
+    def get_invoice(self, invoice_id):
+        return self._get('/invoices/{0}'.format(invoice_id))
+
+    def update_invoice(self, invoice_id, **kwargs):
+        url = '/invoices/{0}'.format(invoice_id)
+        return self._put(url, data=kwargs)
+
+    def delete_invoice(self, invoice_id):
+        return self._delete('/invoices/{0}'.format(invoice_id))
+
+    def get_client_dashboard_url(self, client_key):
+        return '{0}/client/invoices/{1}'.format(self.uri, client_key)
+
     ## Time Tracking
 
     @property
