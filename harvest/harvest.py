@@ -154,14 +154,15 @@ class Harvest(object):
         url = '/people'
         return self._get(url)
 
-    def get_person(self, person_id):
-        return self._get('/people/{0}'.format(person_id))
+    def get_person(self, user_id):
+        return self._get('/people/{0}'.format(user_id))
 
-    def toggle_person_active(self, client_id):
-        return self._get('/people/{0}/toggle'.format(people_id))
+    def toggle_person_active(self, user_id):
+        return self._get('/people/{0}/toggle'.format(user_id))
 
-    def delete_person(self, client_id):
-        return self._delete('/people/{0}'.format(person_id))
+    def delete_person(self, user_id):
+        return self._delete('/people/{0}'.format(user_id))
+
 
     ## Projects
 
