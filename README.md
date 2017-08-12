@@ -8,8 +8,16 @@ Python Harvest API Client
 
 ### Installation
 
+Python 3 and above:
+
 ```
-pip install python-harvest-redux
+pip install "python-harvest-redux>=3.0"
+```
+
+For Python 2 or below:
+
+```
+pip install "python-harvest-redux>=2.0<3.0"
 ```
 
 ### Usage
