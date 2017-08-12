@@ -17,7 +17,7 @@ pip install "python-harvest-redux>=3.0"
 For Python 2 or below:
 
 ```
-pip install "python-harvest-redux>=2.0<3.0"
+pip install "python-harvest-redux==2.0.2"
 ```
 
 ### Usage
