@@ -11,3 +11,4 @@ local/
 *.egg-info/
 dist/
 *.bak
+.eggs/
