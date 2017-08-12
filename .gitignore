@@ -10,3 +10,4 @@ build/
 local/
 *.egg-info/
 dist/
+*.bak
