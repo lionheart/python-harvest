@@ -30,7 +30,8 @@ class HarvestError(Exception):
 
 
 class Harvest(object):
-    def __init__(self, uri, email=None, password=None, refresh_token=None, client_id=None, token=None, put_auth_in_header=True):
+    def __init__(self, uri, email=None, password=None, refresh_token=None, client_id=None, token=None,
+                 put_auth_in_header=True, personal_token=None, account_id=None):
         self.__uri = uri.rstrip('/')
         parsed = urlparse(uri)
         if not (parsed.scheme and parsed.netloc):
@@ -57,7 +58,13 @@ class Harvest(object):
             self.__auth         = 'OAuth2'
             self.__client_id    = client_id
             self.__token        = token
-
+        elif account_id and personal_token:
+            self.__auth = 'Bearer'
+            self.__account_id = account_id
+            self.__personal_token = personal_token
+            if put_auth_in_header:
+                self.__headers['Authorization'] = 'Bearer {0}'.format("{self.personal_token}".format(self=self))
+                self.__headers['Harvest-Account-Id'] = "{self.account_id}".format(self=self)
     @property
     def uri(self):
         return self.__uri
@@ -81,6 +88,14 @@ class Harvest(object):
     @property
     def token(self):
         return self.__token
+
+    @property
+    def personal_token(self):
+        return self.__personal_token
+
+    @property
+    def account_id(self):
+        return self.__account_id
 
     @property
     def status(self):
@@ -359,6 +374,11 @@ class Harvest(object):
             requestor = requests
             if 'Authorization' not in self.__headers:
                 kwargs['auth'] = (self.email, self.password)
+        elif self.auth == 'Bearer':
+            requestor = requests
+            if 'Authorization' not in self.__headers:
+                kwargs['access_token'] = self.personal_token
+                kwargs['account_id'] = self.account_id
         elif self.auth == 'OAuth2':
             requestor = OAuth2Session(client_id=self.client_id, token=self.token)
 
