@@ -28,7 +28,7 @@ class TestHarvest(unittest.TestCase):
         pass
 
     def test_status_not_down(self):
-        self.assertNotEqual("down", harvest.status(), "Harvest must be down?")
+        self.assertEqual("none", self.harvest.status['indicator'], "Harvest API is having problems")
 
 if __name__ == '__main__':
     unittest.main()
