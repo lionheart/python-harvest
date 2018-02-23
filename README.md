@@ -1,5 +1,5 @@
-Python Harvest API Client
-=========================
+![](meta/repo-banner.png)
+[![](meta/repo-banner-bottom.png)][lionheart-url]
 
 ![Version](https://img.shields.io/pypi/v/python-harvest-redux.svg?style=flat)
 ![License](https://img.shields.io/pypi/l/python-harvest-redux.svg?style=flat)
@@ -66,3 +66,6 @@ python-harvest is licensed under Apache 2.0. See [LICENSE](LICENSE) for more det
 ### Authors
 
 See [AUTHORS](AUTHORS).
+
+[lionheart-url]: https://lionheartsw.com/
+
