@@ -1,10 +1,10 @@
 ![](meta/repo-banner.png)
 [![](meta/repo-banner-bottom.png)][lionheart-url]
 
+[![Tests](https://img.shields.io/travis/lionheart/python-harvest.svg?style=flat)](https://travis-ci.org/lionheart/python-harvest)
 ![Version](https://img.shields.io/pypi/v/python-harvest-redux.svg?style=flat)
 ![License](https://img.shields.io/pypi/l/python-harvest-redux.svg?style=flat)
 ![Versions](https://img.shields.io/pypi/pyversions/python-harvest-redux.svg?style=flat)
-[![Tests](https://img.shields.io/travis/lionheart/python-harvest.svg?style=flat)](https://travis-ci.org/lionheart/python-harvest)
 
 ### Installation
 
