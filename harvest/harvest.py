@@ -62,7 +62,12 @@ class Harvest(object):
         elif account_id and personal_token:
             self.__auth = 'Bearer'
             self.__account_id = account_id
-            self.__personal_token = personal_token
+
+            if ('Bearer' in personal_token):
+                self.__personal_token = personal_token[personal_token.index('Bearer ') + len('Bearer'):]
+            else:
+                self.__personal_token = personal_token
+
             if put_auth_in_header:
                 self.__headers['Authorization'] = 'Bearer {0}'.format("{self.personal_token}".format(self=self))
                 self.__headers['Harvest-Account-Id'] = "{self.account_id}".format(self=self)
@@ -313,12 +318,12 @@ class Harvest(object):
 
     ## Invoices
 
-    def invoices(self, page=1, updated_since=None, status=None, from_date=None, to_date=None, client=None):
+    def invoices(self, page=1, updated_since=None, state=None, from_date=None, to_date=None, client=None):
         url = '/invoices?page={0}'.format(page)
         if updated_since is not None:
             url = '{0}&updated_since={1}'.format(url, updated_since)
-        if status is not None:
-            url = '{0}&status={1}'.format(url, status)
+        if state is not None:
+            url = '{0}&state={1}'.format(url, state)
         if from_date is not None:
             url = '{0}&from={1}'.format(url, from_date)
         if to_date is not None:
