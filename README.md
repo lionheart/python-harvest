@@ -11,13 +11,7 @@
 Python 3 and above:
 
 ```
-pip install "python-harvest-redux>=3.0"
-```
-
-For Python 2 or below:
-
-```
-pip install "python-harvest-redux==2.0.2"
+pip install "python-harvest-redux>=3.7"
 ```
 
 ### Usage
@@ -68,4 +62,3 @@ python-harvest is licensed under Apache 2.0. See [LICENSE](LICENSE) for more det
 See [AUTHORS](AUTHORS).
 
 [lionheart-url]: https://lionheartsw.com/
-

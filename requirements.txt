@@ -1,2 +1,4 @@
 requests
 requests_oauthlib
+dataclasses
+dacite

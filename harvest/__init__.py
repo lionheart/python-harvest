@@ -18,6 +18,7 @@ from .metadata import (
 )
 
 from .harvest import *
+from .dataclasses import *
 
 __all__ = [
     '__author__', '__copyright__', '__email__', '__license__',

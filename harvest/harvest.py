@@ -16,6 +16,10 @@ import json
 import requests
 from requests_oauthlib import OAuth2Session
 
+from dacite import from_dict
+
+from .dataclasses import *
+
 try:
     from urllib.parse import urlparse
 except ImportError:
@@ -107,51 +111,47 @@ class Harvest(object):
     def status(self):
         return status()
 
-    ## Accounts
-
-    @property
-    def who_am_i(self):
-        return self._get('/account/who_am_i')
-
     ## Client Contacts
 
-    def contacts(self, updated_since=None):
-        url = '/contacts'
+    def client_contacts(self, page=1, per_page=100, client_id=None, updated_since=None):
+        url = '/contacts?page={0}'.format(page)
+        url = '{0}&per_page={1}'.format(url, per_page)
+        if client_id is not None:
+            url = '{0}&client_id={1}'.format(url, client_id)
         if updated_since is not None:
-            url = '{0}?updated_since={1}'.format(url, updated_since)
-        return self._get(url)
+            url = '{0}&updated_since={1}'.format(url, updated_since)
 
-    def get_contact(self, contact_id):
-        return self._get('/contacts/{0}'.format(contact_id))
+        return from_dict(data_class=ClientContacts, data=self._get(url))
 
-    def create_contact(self, new_contact_id, fname, lname, **kwargs):
+    def get_client_contact(self, contact_id):
+        return from_dict(data_class=ClientContact, data=self._get('/contacts/{0}'.format(contact_id)))
+
+    def create_client_contact(self, new_contact_id, fname, lname, **kwargs):
         url  = '/contacts/{0}'.format(new_contact_id)
         kwargs.update({'first-name':fname, 'last-name':lname})
         return self._post(url, data=kwargs)
 
-    def client_contacts(self, client_id, updated_since=None):
-        url = '/clients/{0}/contacts'.format(client_id)
-        if updated_since is not None:
-            url = '{0}?updated_since={1}'.format(url, updated_since)
-        return self._get(url)
-
-    def update_contact(self, contact_id, **kwargs):
+    def update_client_contact(self, contact_id, **kwargs):
         url = '/contacts/{0}'.format(contact_id)
-        return self._put(url, data=kwargs)
+        return self._patch(url, data=kwargs)
 
-    def delete_contact(self, contact_id):
+    def delete_client_contact(self, contact_id):
         return self._delete('/contacts/{0}'.format(contact_id))
 
     ## Clients
 
-    def clients(self, updated_since=None):
-        url = '/clients'
+    def clients(self, page=1, per_page=100, is_active=None, updated_since=None):
+        url = '/clients?page={0}'.format(page)
+        url = '{0}&per_page={1}'.format(url, per_page)
+        if is_active is not None:
+            url = '{0}&is_active={1}'.format(url, is_active)
         if updated_since is not None:
-            url = '{0}?updated_since={1}'.format(url, updated_since)
-        return self._get(url)
+            url = '{0}&updated_since={1}'.format(url, updated_since)
+
+        return from_dict(data_class=Clients, data=self._get(url))
 
     def get_client(self, client_id):
-        return self._get('/clients/{0}'.format(client_id))
+        return from_dict(data_class=Client, data=self._get('/clients/{0}'.format(client_id)))
 
     def create_client(self, **kwargs):
         url = '/clients/'
@@ -160,54 +160,303 @@ class Harvest(object):
 
     def update_client(self, client_id, **kwargs):
         url = '/clients/{0}'.format(client_id)
-        return self._put(url, data=kwargs)
-
-    def toggle_client_active(self, client_id):
-        return self._post('/clients/{0}/toggle'.format(client_id))
+        return self._patch(url, data=kwargs)
 
     def delete_client(self, client_id):
         return self._delete('/clients/{0}'.format(client_id))
 
+    ## Company
+    
+    def company(self, page=1, per_page=100, is_active=None, updated_since_datetime=None):
+        url = '/company'
+        return from_dict(data_class=Company, data=self._get(url))
 
-     ## People
+    ## Invoices
 
-    def people(self):
-        url = '/people'
-        return self._get(url)
+    def invoice_messages(self, invoice_id, page=1, per_page=100, updated_since=None):
+        url = '/invoices/{0}/messages'.format(invoice_id)
+        url = '{0}?page={1}'.format(url, page)
+        url = '{0}&per_page={1}'.format(url, per_page)
 
-    def get_person(self, user_id):
-        return self._get('/people/{0}'.format(user_id))
+        if updated_since is not None:
+            url = '{0}&updated_since={1}'.format(url, updated_since)
 
-    def toggle_person_active(self, user_id):
-        return self._get('/people/{0}/toggle'.format(user_id))
+        return from_dict(data_class=InvoiceMessages, data=self._get(url))
 
-    def delete_person(self, user_id):
-        return self._delete('/people/{0}'.format(user_id))
+        # TODO: need to come back and manage all the ways of interacting with ain invoice message
 
+    def invoice_payments(self, invoice_id, page=1, per_page=100, updated_since=None):
+        url = '/invoices/{0}/payments'.format(invoice_id)
+        url = '{0}?page={1}'.format(url, page)
+        url = '{0}&per_page={1}'.format(url, per_page)
+
+        if updated_since is not None:
+            url = '{0}&updated_since={1}'.format(url, updated_since)
+
+        return from_dict(data_class=InvoicePayments, data=self._get(url))
+
+    # TODO: need to come back and manage all the ways of paying an invoice
+
+    def invoices(self, page=1, per_page=100, client_id=None, project_id=None, updated_since=None, from_date=None, to_date=None, state=None):
+        url = '/invoices?page={0}'.format(page)
+        url = '{0}&per_page={1}'.format(url, per_page)
+
+        if client_id is not None:
+            url = '{0}&client_id={1}'.format(url, client_id)
+        if project_id is not None:
+            url = '{0}&project_id={1}'.format(url, project_id)
+        if updated_since is not None:
+            url = '{0}&updated_since={1}'.format(url, updated_since)
+        if from_date is not None:
+            url = '{0}&from={1}'.format(url, from_date)
+        if to_date is not None:
+            url = '{0}&to={1}'.format(url, to_date)
+        if state is not None:
+            url = '{0}&state={1}'.format(url, state)
+
+        return from_dict(data_class=Invoices, data=self._get(url))
+
+    def get_invoice(self, invoice_id):
+        return from_dict(data_class=Invoice, data=self._get('/invoices/{0}'.format(invoice_id)))
+
+    def update_invoice(self, invoice_id, **kwargs):
+        url = '/invoices/{0}'.format(invoice_id)
+        return self._patch(url, data=kwargs)
+
+    def delete_invoice(self, invoice_id):
+        return self._delete('/invoices/{0}'.format(invoice_id))
+
+    def invoice_item_categories(self, page=1, per_page=100, updated_since=None):
+        url = '/invoice_item_categories?page={0}'.format(page)
+        url = '{0}&per_page={1}'.format(url, per_page)
+
+        if updated_since is not None:
+            url = '{0}&updated_since={1}'.format(url, updated_since)
+
+        return from_dict(data_class=InvoiceItemCategories, data=self._get(url))
+
+     ## Estimates
+
+    def estimate_messages(self, estimate_id, page=1, per_page=100, updated_since=None):
+        url = '/estimates/{0}/messages'.format(estimate_id)
+        url = '{0}?page={1}'.format(url, page)
+        url = '{0}&per_page={1}'.format(url, per_page)
+
+        if updated_since is not None:
+            url = '{0}&updated_since={1}'.format(url, updated_since)
+
+        return from_dict(data_class=EstimateMessages, data=self._get(url))
+
+    def estimates(self, page=1, per_page=100, client_id=None, updated_since=None, from_date=None, to_date=None, state=None):
+        url = '/estimates?page={0}'.format(page)
+        url = '{0}&per_page={1}'.format(url, per_page)
+
+        if client_id is not None:
+            url = '{0}&client_id={1}'.format(url, client_id)
+        if updated_since is not None:
+            url = '{0}&updated_since={1}'.format(url, updated_since)
+        if from_date is not None:
+            url = '{0}&from_date={1}'.format(url, from_date)
+        if to_date is not None:
+            url = '{0}&to_date={1}'.format(url, to_date)
+
+        return from_dict(data_class=Estimates, data=self._get(url))
+
+    def estimate_item_categories(self, page=1, per_page=100, updated_since=None):
+        url = '/estimate_item_categories?page={0}'.format(page)
+        url = '{0}&per_page={1}'.format(url, per_page)
+
+        if updated_since is not None:
+            url = '{0}&updated_since={1}'.format(url, updated_since)
+
+        return from_dict(data_class=EstimateItemCategories, data=self._get(url))
+
+    ## Expenses
+
+    def expenses(self, page=1, per_page=100, user_id=None, client_id=None, project_id=None, is_billed=None, updated_since=None, from_date=None, to_date=None):
+        url = '/expenses?page={0}'.format(page)
+        url = '{0}&per_page={1}'.format(url, per_page)
+
+        if user_id is not None:
+            url = '{0}&user_id={1}'.format(url, user_id)
+        if client_id is not None:
+            url = '{0}&client_id={1}'.format(url, client_id)
+        if project_id is not None:
+            url = '{0}&project_id={1}'.format(url, project_id)
+        if is_billed is not None:
+            url = '{0}&is_billed={1}'.format(url, is_billed)
+        if updated_since is not None:
+            url = '{0}&updated_since={1}'.format(url, updated_since)
+        if from_date is not None:
+            url = '{0}&from={1}'.format(url, from_date)
+        if to_date is not None:
+            url = '{0}&to_date={1}'.format(url, to_date)
+
+        return from_dict(data_class=Expenses, data=self._get(url))
+
+    def get_expense(self, invoice_id):
+        return from_dict(data_class=Expense, data=self._get('/expenses/{0}'.format(invoice_id)))
+
+    def update_expense(self, invoice_id, **kwargs):
+        url = '/expenses/{0}'.format(invoice_id)
+        return self._patch(url, data=kwargs)
+
+    def delete_expense(self, invoice_id):
+        return self._delete('/expenses/{0}'.format(invoice_id))
+
+    def expense_categories(self, page=1, per_page=100, is_active=None, updated_since=None):
+        url = '/expense_categories?page={0}'.format(page)
+        url = '{0}&per_page={1}'.format(url, per_page)
+
+        if is_active is not None:
+            url = '{0}&is_active={1}'.format(url, is_active)
+        if updated_since is not None:
+            url = '{0}&updated_since={1}'.format(url, updated_since)
+
+        return from_dict(data_class=ExpenseCategories, data=self._get(url))
+
+    def get_expense_category(self, expense_category_id):
+        return from_dict(data_class=ExpenseCategory, data=self._get('/expense_categories/{0}'.format(expense_category_id)))
+
+    def create_expense_category(self, new_expense_category_id, **kwargs):
+        return self._post('/expense_categories/{0}'.format(new_expense_category_id), data=kwargs)
+
+    def update_expense_category(self, expense_category_id, **kwargs):
+        return self._patch('/expense_categories/{0}'.format(expense_category_id), data=kwargs)
+
+    def delete_expense_category(self, expense_category_id):
+        return self._delete('/expense_categories/{0}'.format(expense_category_id))
+
+    ## Tasks
+
+    def tasks(self, page=1, per_page=100, is_active=None, updated_since=None):
+        url = '/tasks?page={0}'.format(page)
+        url = '{0}&per_page={1}'.format(url, per_page)
+
+        if is_active is not None:
+            url = '{0}&is_active={1}'.format(url, is_active)
+        if updated_since is not None:
+            url = '{0}&updated_since={1}'.format(url, updated_since)
+
+        return from_dict(data_class=Tasks, data=self._get(url))
+
+    def get_task(self, task_id):
+        return from_dict(data_class=Task, data=self._get('/tasks/{0}'.format(task_id)))
+
+    def create_task(self, **kwargs):
+        return self._post('/tasks/', data=kwargs)
+
+    def update_task(self, tasks_id, **kwargs):
+        url = '/tasks/{0}'.format(tasks_id)
+        return self._patch(url, data=kwargs)
+
+    def delete_task(self, tasks_id):
+        return self._delete('/tasks/{0}'.format(tasks_id))
+
+    ## Time Entries
+
+    def time_entries(self, page=1, per_page=100, user_id=None, client_id=None, project_id=None, is_billed=None, is_running=None, updated_since=None, from_date=None, to_date=None):
+        url = '/time_entries?page={0}'.format(page)
+        url = '{0}&per_page={1}'.format(url, per_page)
+
+        if user_id is not None:
+            url = '{0}&user_id={1}'.format(url, user_id)
+        if client_id is not None:
+            url = '{0}&client_id={1}'.format(url, client_id)
+        if project_id is not None:
+            url = '{0}&project_id={1}'.format(url, project_id)
+        if is_billed is not None:
+            url = '{0}&is_billed={1}'.format(url, is_billed)
+        if is_running is not None:
+            url = '{0}&is_running={1}'.format(url, is_running)
+        if updated_since is not None:
+            url = '{0}&updated_since={1}'.format(url, updated_since)
+        if from_date is not None:
+            url = '{0}&from={1}'.format(url, from_date)
+        if to_date is not None:
+            url = '{0}&to_date={1}'.format(url, to_date)
+
+        return from_dict(data_class=TimeEntries, data=self._get(url))
+
+    def get_time_entry(self, time_entry_id):
+        return from_dict(data_class=TimeEntry, data=self._get('/time_entries/{0}'.format(time_entry_id)))
+
+    def delete(self, entry_id):
+        return self._delete('/daily/delete/{0}'.format(entry_id))
+
+    def update(self, entry_id, data):
+        return self._post('/daily/update/{0}'.format(entry_id), data)
 
     ## Projects
 
-    def projects(self, client=None):
-        if client:
-            # You can filter by client_id and updated_since.
-            # For example to show only the projects belonging to client with the id 23445.
-            # GET /projects?client=23445
-            return self._get('/projects?client={0}'.format(client))
-        return self._get('/projects')
+    def user_assignments(self, page=1, per_page=100, is_active=None, updated_since=None):
+        url = '/user_assignments?page={0}'.format(page)
+        url = '{0}&per_page={1}'.format(url, per_page)
 
-    def projects_for_client(self, client_id):
-        return self._get('/projects?client={}'.format(client_id))
+        if is_active is not None:
+            url = '{0}&is_active={1}'.format(url, is_active)
+        if updated_since is not None:
+            url = '{0}&updated_since={1}'.format(url, updated_since)
 
-    def timesheets_for_project(self, project_id, start_date, end_date):
-        return self._get('/projects/{0}/entries?from={1}&to={2}'
-                         .format(project_id, start_date, end_date))
+        return from_dict(data_class=UserAssignments, data=self._get(url))
 
-    def expenses_for_project(self, project_id, start_date, end_date):
-        return self._get('/projects/{0}/expenses?from={1}&to={2}'
-                         .format(project_id, start_date, end_date))
+    def project_user_assignments(self, project_id, page=1, per_page=100, is_active=None, updated_since=None):
+        url = '/projects/{0}/user_assignments'.format(project_id)
+        url = '{0}?page={1}'.format(url, page)
+        url = '{0}&per_page={1}'.format(url, per_page)
+
+        if is_active is not None:
+            url = '{0}&is_active={1}'.format(url, is_active)
+        if updated_since is not None:
+            url = '{0}&updated_since={1}'.format(url, updated_since)
+
+        return from_dict(data_class=UserAssignments, data=self._get(url))
+
+    def user_assignment(self, project_id, user_assignment_id):
+        return from_dict(data_class=UserAssignment, data=self._get('/projects/{0}/user_assignments/{1}'.format(project_id, user_assignment_id)))
+
+    def task_assignments(self, page=1, per_page=100, is_active=None, updated_since=None):
+        url = '/task_assignments?page={0}'.format(page)
+        url = '{0}&per_page={1}'.format(url, per_page)
+
+        if is_active is not None:
+            url = '{0}&is_active={1}'.format(url, is_active)
+        if updated_since is not None:
+            url = '{0}&updated_since={1}'.format(url, updated_since)
+
+        return from_dict(data_class=TaskAssignments, data=self._get(url))
+
+    def project_task_assignments(self, project_id, page=1, per_page=100, is_active=None, updated_since=None):
+        url = '/projects/{0}/task_assignments'.format(project_id)
+        url = '{0}?page={1}'.format(url, page)
+        url = '{0}&per_page={1}'.format(url, per_page)
+
+        if is_active is not None:
+            url = '{0}&is_active={1}'.format(url, is_active)
+        if updated_since is not None:
+            url = '{0}&updated_since={1}'.format(url, updated_since)
+
+        return from_dict(data_class=TaskAssignments, data=self._get(url))
+
+    def task_assignment(self, project_id, task_assignment_id):
+        return from_dict(data_class=TaskAssignment, data=self._get('/projects/{0}/task_assignments/{1}'.format(project_id, task_assignment_id)))
+
+
+    def projects(self, page=1, per_page=100, client_id=None, is_active=None, updated_since=None):
+        url = '/projects?page={0}'.format(page)
+        url = '{0}&per_page={1}'.format(url, per_page)
+
+        if client_id is not None:
+            url = '{0}&client_id={1}'.format(url, client_id)
+        if is_active is not None:
+            url = '{0}&is_active={1}'.format(url, is_active)
+        if updated_since is not None:
+            url = '{0}&updated_since={1}'.format(url, updated_since)
+
+        return from_dict(data_class=Projects, data=self._get(url))
 
     def get_project(self, project_id):
-        return self._get('/projects/{0}'.format(project_id))
+        return from_dict(data_class=Project, data=self._get('/projects/{0}'.format(project_id)))
 
     def create_project(self, **kwargs):
         # Example: client.create_project(project={"name": title, "client_id": client_id})
@@ -217,163 +466,68 @@ class Harvest(object):
         url = '/projects/{0}'.format(project_id)
         return self._put(url, data=kwargs)
 
-    def toggle_project_active(self, project_id):
-        return self._put('/projects/{0}/toggle'.format(project_id))
-
     def delete_project(self, project_id):
         return self._delete('/projects/{0}'.format(project_id))
 
-    ## Tasks
 
-    def tasks(self, updated_since=None):
-        # /tasks?updated_since=2010-09-25+18%3A30
-        if updated_since:
-            return self._get('/tasks?updated_since={0}'.format(updated_since))
-        return self._get('/tasks')
+     ## Roles
 
-    def get_task(self, task_id):
-        return self._get('/tasks/{0}'.format(task_id))
+    def roles(self, page=1, per_page=100):
+        url = '/roles?page={0}'.format(page)
+        url = '{0}&per_page={1}'.format(url, per_page)
 
-    def create_task(self, **kwargs):
-        # CREATE NEW TASK
-        # client.create_task(task={"name":"jo"})
-        return self._post('/tasks/', data=kwargs)
+        return from_dict(data_class=Roles, data=self._get(url))
 
-    def update_task(self, tasks_id, **kwargs):
-        # UPDATE AN EXISTING TASK
-        # client.update_task(task_id, task={"name": "jo"})
-        url = '/tasks/{0}'.format(tasks_id)
-        return self._put(url, data=kwargs)
+    def get_role(self, project_id):
+        return from_dict(data_class=Role, data=self._get('/roles/{0}'.format(project_id)))
 
-    def delete_task(self, tasks_id):
-        # ARCHIVE OR DELETE EXISTING TASK
-        # Returned if task does not have any hours associated - task will be deleted.
-        # Returned if task is not removable - task will be archived.
-        return self._delete('/tasks/{0}'.format(tasks_id))
+     ## Users
 
-    def activate_task(self, tasks_id):
-        # ACTIVATE EXISTING ARCHIVED TASK
-        return self._post('/tasks/{0}/activate'.format(tasks_id))
+    def user_cost_rates(self, user_id, page=1, per_page=100):
+        url = '/users/{0}/cost_rates'.format(user_id)
+        url = '{0}?page={1}'.format(url, page)
+        url = '{0}&per_page={1}'.format(url, per_page)
 
-    ## Task Assignment: Assigning tasks to projects
+        return from_dict(data_class=UserCostRates, data=self._get(url))
 
-    def get_all_tasks_from_project(self, project_id):
-        # GET ALL TASKS ASSIGNED TO A GIVEN PROJECT
-        # /projects/#{project_id}/task_assignments
-        return self._get('/projects/{0}/task_assignments'.format(project_id))
+    def user_cost_rate(self, user_id, cost_rate_id):
+        url = '/users/{0}/cost_rates/{1}'.format(user_id, cost_rate_id)
 
-    def get_one_task_assigment(self, project_id, task_id):
-        # GET ONE TASK ASSIGNMENT
-        # GET /projects/#{project_id}/task_assignments/#{task_assignment_id}
-        return self._get('/projects/{0}/task_assignments/{1}'.format(project_id, task_id))
+        return from_dict(data_class=CostRate, data=self._get(url))
 
-    def assign_task_to_project(self, project_id, **kwargs):
-        # ASSIGN A TASK TO A PROJECT
-        # POST /projects/#{project_id}/task_assignments
-        return self._post('/projects/{0}/task_assignments/'.format(project_id), kwargs)
+    def project_assignments(self, user_id, page=1, per_page=100, updated_since=None):
+        url = '/users/{0}/project_assignments'.format(user_id)
+        url = '{0}?page={1}'.format(url, page)
+        url = '{0}&per_page={1}'.format(url, per_page)
 
-    def create_task_to_project(self, project_id, **kwargs):
-        # CREATE A NEW TASK AND ASSIGN IT TO A PROJECT
-        # POST /projects/#{project_id}/task_assignments/add_with_create_new_task
-        return self._post('/projects/{0}/task_assignments/add_with_create_new_task'.format(project_id), kwargs)
-
-    def remove_task_from_project(self, project_id, task_id):
-        # REMOVING A TASK FROM A PROJECT
-        # DELETE /projects/#{project_id}/task_assignments/#{task_assignment_id}
-        return self._delete('/projects/{0}/task_assignments/{1}'.format(project_id, task_id))
-
-    def change_task_from_project(self, project_id, task_id, data, **kwargs):
-        # CHANGING A TASK FOR A PROJECT
-        # PUT /projects/#{project_id}/task_assignments/#{task_assignment_id}
-        kwargs.update({'task-assignment': data})
-        return self._put('/projects/{0}/task_assignments/{1}'.format(project_id, task_id), kwargs)
-
-    ## User Assignment: Assigning users to projects
-
-    def assign_user_to_project(self, project_id, user_id):
-        # ASSIGN A USER TO A PROJECT
-        # POST /projects/#{project_id}/user_assignments
-        return self._post('/projects/{0}/user_assignments'.format(project_id), {"user": {"id": user_id}})
-
-    ## Expense Categories
-
-    @property
-    def expense_categories(self):
-        return self._get('/expense_categories')
-
-    def create_expense_category(self, new_expense_category_id, **kwargs):
-        return self._post('/expense_categories/{0}'.format(new_expense_category_id), data=kwargs)
-
-    def update_expense_category(self, expense_category_id, **kwargs):
-        return self._put('/expense_categories/{0}'.format(expense_category_id), data=kwargs)
-
-    def get_expense_category(self, expense_category_id):
-        return self._get('/expense_categories/{0}'.format(expense_category_id))
-
-    def delete_expense_category(self, expense_category_id):
-        return self._delete('/expense_categories/{0}'.format(expense_category_id))
-
-    def toggle_expense_category_active(self, expense_category_id):
-        return self._get('/expense_categories/{0}/toggle'.format(expense_category_id))
-
-    ## Invoices
-
-    def invoices(self, page=1, updated_since=None, state=None, from_date=None, to_date=None, client=None):
-        url = '/invoices?page={0}'.format(page)
         if updated_since is not None:
             url = '{0}&updated_since={1}'.format(url, updated_since)
-        if state is not None:
-            url = '{0}&state={1}'.format(url, state)
-        if from_date is not None:
-            url = '{0}&from={1}'.format(url, from_date)
-        if to_date is not None:
-            url = '{0}&to={1}'.format(url, to_date)
-        if client is not None:
-            url = '{0}&client={1}'.format(url, client)
-        return self._get(url)
 
-    def get_invoice(self, invoice_id):
-        return self._get('/invoices/{0}'.format(invoice_id))
+        return from_dict(data_class=ProjectAssignments, data=self._get(url))
 
-    def update_invoice(self, invoice_id, **kwargs):
-        url = '/invoices/{0}'.format(invoice_id)
-        return self._put(url, data=kwargs)
+    def my_project_assignments(self, page=1, per_page=100):
+        url = '/users/me/project_assignments?page={0}'.format(page)
+        url = '{0}&per_page={1}'.format(url, per_page)
 
-    def delete_invoice(self, invoice_id):
-        return self._delete('/invoices/{0}'.format(invoice_id))
+        return from_dict(data_class=ProjectAssignments, data=self._get(url))
 
-    def get_client_dashboard_url(self, client_key):
-        return '{0}/client/invoices/{1}'.format(self.uri, client_key)
+    def users(self, page=1, per_page=100, is_active=None, updated_since=None):
+        url = '/users?page={0}'.format(page)
+        url = '{0}&per_page={1}'.format(url, per_page)
 
-    ## Time Tracking
+        if is_active is not None:
+            url = '{0}&is_active={1}'.format(url, is_active)
+        if updated_since is not None:
+            url = '{0}&updated_since={1}'.format(url, updated_since)
 
-    @property
-    def today(self):
-        return self._get('/daily')
+        return from_dict(data_class=Users, data=self._get(url))
 
-    def today_user(self, user_id):
-        return self._get('/daily?of_user={0}'.format(user_id))
+    def get_user(self, user_id):
+        return from_dict(data_class=User, data=self._get('/users/{0}'.format(user_id)))
 
-    def get_day(self, day_of_the_year=1, year=2012):
-        return self._get('/daily/{0}/{1}'.format(day_of_the_year, year))
+    def currently_authenticated_user(self):
+        return from_dict(data_class=User, data=self._get('/users/me'))
 
-    def get_entry(self, entry_id):
-        return self._get('/daily/show/{0}'.format(entry_id))
-
-    def toggle_timer(self, entry_id):
-        return self._get('/daily/timer/{0}'.format(entry_id))
-
-    def add(self, data):
-        return self._post('/daily/add', data)
-
-    def add_for_user(self, user_id, data):
-        return self._post('/daily/add?of_user={0}'.format(user_id), data)
-
-    def delete(self, entry_id):
-        return self._delete('/daily/delete/{0}'.format(entry_id))
-
-    def update(self, entry_id, data):
-        return self._post('/daily/update/{0}'.format(entry_id), data)
 
     def _get(self, path='/', data=None):
         return self._request('GET', path, data)
@@ -387,16 +541,8 @@ class Harvest(object):
     def _delete(self, path='/', data=None):
         return self._request('DELETE', path, data)
 
-    # users
-    @property
-    def users(self):
-        return self._get('/people')
-
-    def userfilter(self, user_id):
-        return self._get('/people/{0}'.format(user_id))
-
-    def user_hours(self, user_id, start, stop):
-        return self._get('/people/{0}/entries?from={1}&to={2}'.format(user_id,start,stop))
+    def _patch(self, path='/', data=None):
+        return self._request('PATCH', path, data)
 
     def _request(self, method='GET', path='/', data=None):
         url = '{self.uri}{path}'.format(self=self, path=path)
@@ -428,7 +574,6 @@ class Harvest(object):
             return resp
         except Exception as e:
             raise HarvestError(e)
-
 
 def status():
     try:
