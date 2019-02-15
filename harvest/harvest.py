@@ -128,7 +128,7 @@ class Harvest(object):
 
     def create_client_contact(self, client_id, first_name, **kwargs):
         url  = '/contacts'
-        kwargs.update({'client_id' : client_id, 'first_name':first_name})
+        kwargs.update({'client_id': client_id, 'first_name': first_name})
         return from_dict(data_class=ClientContact, data=self._post(url, data=kwargs))
 
     def update_client_contact(self, contact_id, **kwargs):
@@ -153,17 +153,17 @@ class Harvest(object):
     def get_client(self, client_id):
         return from_dict(data_class=Client, data=self._get('/clients/{0}'.format(client_id)))
 
-    def create_client(self, **kwargs):
-        url = '/clients/'
-        # client.create_client(client={"name":"jo"})
-        return self._post(url, data=kwargs)
+    def create_client(self, name, **kwargs):
+        url  = '/clients'
+        kwargs.update({'name': name})
+        return from_dict(data_class=Client, data=self._post(url, data=kwargs))
 
     def update_client(self, client_id, **kwargs):
         url = '/clients/{0}'.format(client_id)
-        return self._patch(url, data=kwargs)
+        return from_dict(data_class=Client, data=self._patch(url, data=kwargs))
 
     def delete_client(self, client_id):
-        return self._delete('/clients/{0}'.format(client_id))
+        self._delete('/clients/{0}'.format(client_id))
 
     ## Company
 

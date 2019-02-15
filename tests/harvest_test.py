@@ -50,14 +50,14 @@ class TestHarvest(unittest.TestCase):
         self.assertEqual("none", self.harvest.status['indicator'], "Harvest API is having problems")
 
 
-    # def test_delete_client_contact(self):
-    #     client_contact = self.harvest.delete_client_contact(7180909)
+    # def test_delete_client(self):
+    #     client = self.harvest.delete_client(7811346)
     #
-    # def test_update_client_contact(self):
-    #     client_contact = self.harvest.update_client_contact(7180908, email='brad@example.com.au')
+    # def test_update_client(self):
+    #     client = self.harvest.update_client(7811346, address='Alice Springs')
     #
-    def test_create_client_contact(self):
-        client_contact = self.harvest.create_client_contact(7439772, 'Brad', email='brad@example.com')
+    # def test_create_client(self):
+    #     client = self.harvest.create_client('Brad Pty. Ltd', email='brad@example.com')
 
     # def test_delete_client_contact(self):
     #     client_contact = self.harvest.delete_client_contact(7180909)

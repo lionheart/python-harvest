@@ -54,11 +54,11 @@ class ClientRef:
 
 @dataclass
 class Client:
+    address: Optional[str]
     id: int = None
     name: str = None
     currency: str = None
     is_active: bool = None
-    address: str = None
     created_at: str = None
     updated_at: str = None
 
