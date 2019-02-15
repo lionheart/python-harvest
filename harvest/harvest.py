@@ -126,17 +126,17 @@ class Harvest(object):
     def get_client_contact(self, contact_id):
         return from_dict(data_class=ClientContact, data=self._get('/contacts/{0}'.format(contact_id)))
 
-    def create_client_contact(self, new_contact_id, fname, lname, **kwargs):
-        url  = '/contacts/{0}'.format(new_contact_id)
-        kwargs.update({'first-name':fname, 'last-name':lname})
-        return self._post(url, data=kwargs)
+    def create_client_contact(self, client_id, first_name, **kwargs):
+        url  = '/contacts'
+        kwargs.update({'client_id' : client_id, 'first_name':first_name})
+        return from_dict(data_class=ClientContact, data=self._post(url, data=kwargs))
 
     def update_client_contact(self, contact_id, **kwargs):
         url = '/contacts/{0}'.format(contact_id)
-        return self._patch(url, data=kwargs)
+        return from_dict(data_class=ClientContact, data=self._patch(url, data=kwargs))
 
     def delete_client_contact(self, contact_id):
-        return self._delete('/contacts/{0}'.format(contact_id))
+        self._delete('/contacts/{0}'.format(contact_id))
 
     ## Clients
 
@@ -166,7 +166,7 @@ class Harvest(object):
         return self._delete('/clients/{0}'.format(client_id))
 
     ## Company
-    
+
     def company(self, page=1, per_page=100, is_active=None, updated_since_datetime=None):
         url = '/company'
         return from_dict(data_class=Company, data=self._get(url))

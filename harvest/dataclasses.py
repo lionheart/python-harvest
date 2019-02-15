@@ -1,4 +1,4 @@
-from dataclasses import dataclass, field, asdict
+from dataclasses import dataclass, field
 from typing import Optional, List
 
 @dataclass
@@ -162,9 +162,9 @@ class Invoice:
 @dataclass
 class ClientContact:
     title: Optional[str]
+    last_name: Optional[str]
     id: int = None
     first_name: str = None
-    last_name: str = None
     email: str = None
     phone_office: str = None
     phone_mobile: str = None
