@@ -619,6 +619,18 @@ class Harvest(object):
     def user_assignment(self, project_id, user_assignment_id):
         return from_dict(data_class=UserAssignment, data=self._get('/projects/{0}/user_assignments/{1}'.format(project_id, user_assignment_id)))
 
+    def create_user_assignment(self, user_id, **kwargs):
+        url = '/projects/{0}/user_assignments'.format(user_id)
+        kwargs.update({'user_id': user_id})
+        return from_dict(data_class=UserAssignment, data=self._post(url, data=kwargs))
+
+    def update_user_assignment(self, project_id, user_assignment_id, **kwargs):
+        url = '/projects/{0}/user_assignments/{1}'.format(project_id, user_assignment_id)
+        return from_dict(data_class=UserAssignment, data=self._patch(url, data=kwargs))
+
+    def delete_user_assignment(self, project_id, user_assignment_id):
+        return self._delete('/projects/{0}/user_assignments/{1}'.format(project_id, user_assignment_id))
+
     def task_assignments(self, page=1, per_page=100, is_active=None, updated_since=None):
         url = '/task_assignments?page={0}'.format(page)
         url = '{0}&per_page={1}'.format(url, per_page)
@@ -642,9 +654,20 @@ class Harvest(object):
 
         return from_dict(data_class=TaskAssignments, data=self._get(url))
 
-    def task_assignment(self, project_id, task_assignment_id):
+    def get_task_assignment(self, project_id, task_assignment_id):
         return from_dict(data_class=TaskAssignment, data=self._get('/projects/{0}/task_assignments/{1}'.format(project_id, task_assignment_id)))
 
+    def create_task_assignment(self, project_id, task_id, **kwargs):
+        url = '/projects/{0}/task_assignments'.format(project_id)
+        kwargs.update({'task_id': task_id})
+        return from_dict(data_class=TaskAssignment, data=self._post(url, data=kwargs))
+
+    def update_task_assignment(self, project_id, task_assignment_id, **kwargs):
+        url = '/projects/{0}/task_assignments/{1}'.format(project_id, task_assignment_id)
+        return from_dict(data_class=TaskAssignment, data=self._patch(url, data=kwargs))
+
+    def delete_user_assignment(self, project_id, task_assignment_id):
+        return self._delete('/projects/{0}/task_assignments/{1}'.format(project_id, task_assignment_id))
 
     def projects(self, page=1, per_page=100, client_id=None, is_active=None, updated_since=None):
         url = '/projects?page={0}'.format(page)
