@@ -16,6 +16,7 @@ import os, sys
 import unittest
 from time import time
 import configparser
+from dataclasses import asdict
 
 sys.path.insert(0, sys.path[0]+"/..")
 
@@ -49,137 +50,164 @@ class TestHarvest(unittest.TestCase):
     def test_status_not_down(self):
         self.assertEqual("none", self.harvest.status['indicator'], "Harvest API is having problems")
 
+    def test_client(self):
+        original_clients = self.harvest.clients()
+        original_client_count = original_clients.total_entries
 
-    # def test_create_invoice_based_on_tracked_time_and_expenses(self):
-    #     my_expense_import = harvest.ExpenseImport(summary_type="category")
-    #     my_time_import = harvest.TimeImport(summary_type="task", to="2017-03-31")
-    #     my_line_item_import = harvest.LineItemImport(project_ids=[19245190], time=my_time_import, expenses=my_expense_import)
-    #     my_invoice = harvest.InvoiceImport(notes=None, client_id=7439773, subject="ABC Project Quote 1", payment_term='upon receipt', line_items_import=my_line_item_import)
-    #     invoice = self.harvest.create_invoice_based_on_tracked_time_and_expenses(7439773, my_invoice)
+        client = {'name':'Pinky', 'currency':'USD', 'is_active':True, 'address':'ACME Labs'}
+        new_client = self.harvest.create_client(**client)
 
-    # def test_create_free_form_invoice(self):
-    #     my_line_item = harvest.LineItem(project=None, kind="Service", description="ABC Project",unit_price=5000.0)
-    #     my_invoice = harvest.FreeFormInvoice(notes=None, client_id=7439772, subject="ABC Project Quote 1", due_date="2017-07-27", line_items=[my_line_item])
-    #     client = self.harvest.create_free_form_invoice(7439772, my_invoice)
+        clients = self.harvest.clients()
 
-    # def test_delete_client(self):
-    #     client = self.harvest.delete_client(7811346)
-    #
-    # def test_update_client(self):
-    #     client = self.harvest.update_client(7811346, address='Alice Springs')
-    #
-    # def test_create_invoice_message(self):
-    #     client = self.harvest.create_invoice_message()
+        client_count = clients.total_entries
 
-    # def test_delete_client(self):
-    #     client = self.harvest.delete_client(7811346)
-    #
-    # def test_update_client(self):
-    #     client = self.harvest.update_client(7811346, address='Alice Springs')
-    #
-    # def test_create_client(self):
-    #     client = self.harvest.create_client('Brad Pty. Ltd', email='brad@example.com')
+        self.assertTrue(client_count > original_client_count, "We didn't add a client.")
 
-    # def test_delete_client_contact(self):
-    #     client_contact = self.harvest.delete_client_contact(7180909)
-    #
-    # def test_update_client_contact(self):
-    #     client_contact = self.harvest.update_client_contact(7180908, email='brad@example.com.au')
-    #
-    # def test_create_client_contact(self):
-    #     client_contact = self.harvest.create_client_contact(7439772, 'Brad', email='brad@example.com')
-    #
-    # def test_company(self):
-    #     company = self.harvest.company()
-    #
-    # def test_company(self):
-    #     company = self.harvest.company()
-    #
-    # def test_client_contacts(self):
-    #     client_contacts = self.harvest.client_contacts()
-    #
-    # def test_clients(self):
-    #     clients = self.harvest.clients()
-    #
-    # def test_invoice_messages(self):
-    #     invoice_messages = self.harvest.invoice_messages(18321917) # an invoice_id _MUST_ be filled
-    #
-    # def test_invoice_payments(self):
-    #     invoice_payments = self.harvest.invoice_payments(18321917) # an invoice_id _MUST_ be filled
-    #
-    # def test_all_invoices(self):
-    #     invoices = self.harvest.invoices()
-    #
-    # def test_all_invoice_item_categories(self):
-    #     invoice_item_categories = self.harvest.invoice_item_categories()
-    #
-    # def test_all_estimate_messages(self):
-    #     estimate_messages = self.harvest.estimate_messages(1961420) # an estimate id _MUST_ be filled
-    #
-    # def test_all_estimate_messages(self):
-    #     estimate_messages = self.harvest.estimate_messages(1961420) # an estimate id _MUST_ be filled
-    #
-    # def test_all_estimates(self):
-    #     estimates = self.harvest.estimates()
-    #
-    # def test_all_estimate_item_categories(self):
-    #     estimate_item_categories = self.harvest.estimate_item_categories()
-    #
-    # def test_all_estimate_item_categories(self):
-    #     estimate_item_categories = self.harvest.estimate_item_categories()
-    #
-    # def test_all_expense_categories(self):
-    #     #self.assertEqual("none", self.harvest.status['indicator'], "Harvest API is having problems")
-    #     expense_categories = self.harvest.expense_categories()
-    #
-    # def test_two_expense_categories(self):
-    #     expense_categories = self.harvest.expense_categories(per_page=2)
-    #
-    # def test_all_expenses(self):
-    #     expenses = self.harvest.expenses()
-    #
-    # def test_all_tasks(self):
-    #     tasks = self.harvest.tasks()
-    #
-    # def test_task(self):
-    #     task = self.harvest.get_task(10997931)
-    #
-    # def test_all_time_entries(self):
-    #     time_entries = self.harvest.time_entries()
-    #
-    # def test_all_user_assignments(self):
-    #     user_assignments = self.harvest.user_assignments()
-    #
-    # def test_all_task_assignments(self):
-    #     task_assignments = self.harvest.task_assignments()
-    #
-    # def test_all_projects(self):
-    #     projects = self.harvest.projects()
-    #
-    # def test_all_roles(self):
-    #     roles = self.harvest.roles()
-    #
-    # def test_all_user_cost_rates(self):
-    #     user_cost_rates = self.harvest.user_cost_rates(2438626) # user Id
-    #
-    # def test_all_user_cost_rate(self):
-    #     user_cost_rate = self.harvest.user_cost_rate(2438626, 353253) # user Id, cost rate
-    #
-    # def test_all_project_assignments(self):
-    #     project_assignments = self.harvest.project_assignments(2438626) # user Id
-    #
-    # def test_my_project_assignments(self):
-    #     my_project_assignments = self.harvest.my_project_assignments()
-    #
-    # def test_users(self):
-    #     users = self.harvest.users()
-    #
-    # def test_currently_authenticated_user(self):
-    #     currently_authenticated_user = self.harvest.currently_authenticated_user()
-    #
-    # def test_user(self):
-    #     user = self.harvest.get_user(2438626)
+        client_record = self.harvest.get_client(new_client.id)
+        print(client_record)
+        self.assertTrue(client['name'] == client_record.name, "No such client as the one we tried to make.")
 
+        self.harvest.update_client(new_client.id, name='The Brain')
+
+        updated_client_record = self.harvest.get_client(new_client.id)
+
+        print(updated_client_record)
+
+        self.assertFalse(updated_client_record.name == client['name'], "The updated client record retained the original name.")
+        self.assertTrue(updated_client_record.name == 'The Brain', "The updated client record does not have the name we tried to set.")
+
+        self.harvest.delete_client(new_client.id)
+
+
+
+# def test_create_invoice_based_on_tracked_time_and_expenses(self):
+#     my_expense_import = harvest.ExpenseImport(summary_type="category")
+#     my_time_import = harvest.TimeImport(summary_type="task", to="2017-03-31")
+#     my_line_item_import = harvest.LineItemImport(project_ids=[19245190], time=my_time_import, expenses=my_expense_import)
+#     my_invoice = harvest.InvoiceImport(notes=None, client_id=7439773, subject="ABC Project Quote 1", payment_term='upon receipt', line_items_import=my_line_item_import)
+#     invoice = self.harvest.create_invoice_based_on_tracked_time_and_expenses(7439773, my_invoice)
+
+# def test_create_free_form_invoice(self):
+#     my_line_item = harvest.LineItem(project=None, kind="Service", description="ABC Project",unit_price=5000.0)
+#     my_invoice = harvest.FreeFormInvoice(notes=None, client_id=7439772, subject="ABC Project Quote 1", due_date="2017-07-27", line_items=[my_line_item])
+#     client = self.harvest.create_free_form_invoice(7439772, my_invoice)
+
+# def test_delete_client(self):
+#     client = self.harvest.delete_client(7811346)
+#
+# def test_update_client(self):
+#     client = self.harvest.update_client(7811346, address='Alice Springs')
+#
+# def test_create_invoice_message(self):
+#     client = self.harvest.create_invoice_message()
+
+# def test_delete_client(self):
+#     client = self.harvest.delete_client(7811346)
+#
+# def test_update_client(self):
+#     client = self.harvest.update_client(7811346, address='Alice Springs')
+#
+# def test_create_client(self):
+#     client = self.harvest.create_client('Brad Pty. Ltd', email='brad@example.com')
+
+# def test_delete_client_contact(self):
+#     client_contact = self.harvest.delete_client_contact(7180909)
+#
+# def test_update_client_contact(self):
+#     client_contact = self.harvest.update_client_contact(7180908, email='brad@example.com.au')
+#
+# def test_create_client_contact(self):
+#     client_contact = self.harvest.create_client_contact(7439772, 'Brad', email='brad@example.com')
+#
+# def test_company(self):
+#     company = self.harvest.company()
+#
+# def test_company(self):
+#     company = self.harvest.company()
+#
+# def test_client_contacts(self):
+#     client_contacts = self.harvest.client_contacts()
+#
+
+#
+# def test_invoice_messages(self):
+#     invoice_messages = self.harvest.invoice_messages(18321917) # an invoice_id _MUST_ be filled
+#
+# def test_invoice_payments(self):
+#     invoice_payments = self.harvest.invoice_payments(18321917) # an invoice_id _MUST_ be filled
+#
+# def test_all_invoices(self):
+#     invoices = self.harvest.invoices()
+#
+# def test_all_invoice_item_categories(self):
+#     invoice_item_categories = self.harvest.invoice_item_categories()
+#
+# def test_all_estimate_messages(self):
+#     estimate_messages = self.harvest.estimate_messages(1961420) # an estimate id _MUST_ be filled
+#
+# def test_all_estimate_messages(self):
+#     estimate_messages = self.harvest.estimate_messages(1961420) # an estimate id _MUST_ be filled
+#
+# def test_all_estimates(self):
+#     estimates = self.harvest.estimates()
+#
+# def test_all_estimate_item_categories(self):
+#     estimate_item_categories = self.harvest.estimate_item_categories()
+#
+# def test_all_estimate_item_categories(self):
+#     estimate_item_categories = self.harvest.estimate_item_categories()
+#
+# def test_all_expense_categories(self):
+#     #self.assertEqual("none", self.harvest.status['indicator'], "Harvest API is having problems")
+#     expense_categories = self.harvest.expense_categories()
+#
+# def test_two_expense_categories(self):
+#     expense_categories = self.harvest.expense_categories(per_page=2)
+#
+# def test_all_expenses(self):
+#     expenses = self.harvest.expenses()
+#
+# def test_all_tasks(self):
+#     tasks = self.harvest.tasks()
+#
+# def test_task(self):
+#     task = self.harvest.get_task(10997931)
+#
+# def test_all_time_entries(self):
+#     time_entries = self.harvest.time_entries()
+#
+# def test_all_user_assignments(self):
+#     user_assignments = self.harvest.user_assignments()
+#
+# def test_all_task_assignments(self):
+#     task_assignments = self.harvest.task_assignments()
+#
+# def test_all_projects(self):
+#     projects = self.harvest.projects()
+#
+# def test_all_roles(self):
+#     roles = self.harvest.roles()
+#
+# def test_all_user_cost_rates(self):
+#     user_cost_rates = self.harvest.user_cost_rates(2438626) # user Id
+#
+# def test_all_user_cost_rate(self):
+#     user_cost_rate = self.harvest.user_cost_rate(2438626, 353253) # user Id, cost rate
+#
+# def test_all_project_assignments(self):
+#     project_assignments = self.harvest.project_assignments(2438626) # user Id
+#
+# def test_my_project_assignments(self):
+#     my_project_assignments = self.harvest.my_project_assignments()
+#
+# def test_users(self):
+#     users = self.harvest.users()
+#
+# def test_currently_authenticated_user(self):
+#     currently_authenticated_user = self.harvest.currently_authenticated_user()
+#
+# def test_user(self):
+#     user = self.harvest.get_user(2438626)
 
 if __name__ == '__main__':
     unittest.main()

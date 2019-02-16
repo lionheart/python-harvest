@@ -2,6 +2,10 @@ from dataclasses import dataclass, field
 from typing import Optional, List
 
 @dataclass
+class ErrorMessage:
+    message: str
+
+@dataclass
 class Company:
     base_uri: str = None
     full_domain: str = None
@@ -115,14 +119,14 @@ class LineItem:
 @dataclass
 class ExpenseImport:
     summary_type: str
-    from: str = None
+    #from: str = None
     to: str = None
     attach_receipt: str = None
 
 @dataclass
 class TimeImport:
     summary_type: str
-    from: str = None
+    #from: str = None
     to: str = None
 
 @dataclass
@@ -514,6 +518,7 @@ class BasePage:
 class ClientContacts(BasePage):
     contacts: List[ClientContact] = field(init=False)
 
+@dataclass
 class Clients(BasePage):
     clients: List[Client] = field(init=False)
 

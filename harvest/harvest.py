@@ -148,7 +148,7 @@ class Harvest(object):
             url = '{0}&is_active={1}'.format(url, is_active)
         if updated_since is not None:
             url = '{0}&updated_since={1}'.format(url, updated_since)
-
+            
         return from_dict(data_class=Clients, data=self._get(url))
 
     def get_client(self, client_id):
@@ -157,7 +157,12 @@ class Harvest(object):
     def create_client(self, name, **kwargs):
         url  = '/clients'
         kwargs.update({'name': name})
-        return from_dict(data_class=Client, data=self._post(url, data=kwargs))
+        response = self._post(url, data=kwargs)
+
+        if 'message' in response.keys():
+            return from_dict(data_class=ErrorMessage, data=response)
+
+        return from_dict(data_class=Client, data=response)
 
     def update_client(self, client_id, **kwargs):
         url = '/clients/{0}'.format(client_id)
@@ -570,10 +575,10 @@ class Harvest(object):
         return from_dict(data_class=TimeEntry, data=self._post(url, data=kwargs))
 
     def create_time_entry_via_start_and_end_time(self, project_id, task_id, spent_date, **kwargs):
-        return create_time_entry(project_id, task_id, spent_date, kwargs):
+        return create_time_entry(project_id, task_id, spent_date, kwargs)
 
     def create_time_entry_via_duration(self, project_id, task_id, spent_date, **kwargs):
-        return create_time_entry(project_id, task_id, spent_date, kwargs):
+        return create_time_entry(project_id, task_id, spent_date, kwargs)
 
     def update_time_entry(self, time_entry_id, **kwargs):
         url = '/time_entries/{0}'.format(time_entry_id)
