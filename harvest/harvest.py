@@ -496,11 +496,14 @@ class Harvest(object):
     def get_expense_category(self, expense_category_id):
         return from_dict(data_class=ExpenseCategory, data=self._get('/expense_categories/{0}'.format(expense_category_id)))
 
-    def create_expense_category(self, new_expense_category_id, **kwargs):
-        return self._post('/expense_categories/{0}'.format(new_expense_category_id), data=kwargs)
+    def create_expense_category(self, name, **kwargs):
+        url = '/expense_categories'
+        kwargs.update({'name': name})
+        return from_dict(data_class=ExpenseCategory, data=self._post(url, data=kwargs))
 
-    def update_expense_category(self, expense_category_id, **kwargs):
-        return self._patch('/expense_categories/{0}'.format(expense_category_id), data=kwargs)
+    def update_expense_category(self, **kwargs):
+        url = '/expense_categories'
+        return from_dict(data_class=ExpenseCategory, data=self._patch(url, data=kwargs))
 
     def delete_expense_category(self, expense_category_id):
         return self._delete('/expense_categories/{0}'.format(expense_category_id))
