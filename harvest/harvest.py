@@ -564,11 +564,32 @@ class Harvest(object):
     def get_time_entry(self, time_entry_id):
         return from_dict(data_class=TimeEntry, data=self._get('/time_entries/{0}'.format(time_entry_id)))
 
-    def delete(self, entry_id):
-        return self._delete('/daily/delete/{0}'.format(entry_id))
+    def create_time_entry(self, project_id, task_id, spent_date, **kwargs):
+        url = '/time_entries'
+        kwargs.update({'project_id': project_id, 'task_id': task_id, 'spent_date': spent_date})
+        return from_dict(data_class=TimeEntry, data=self._post(url, data=kwargs))
 
-    def update(self, entry_id, data):
-        return self._post('/daily/update/{0}'.format(entry_id), data)
+    def create_time_entry_via_start_and_end_time(self, project_id, task_id, spent_date, **kwargs):
+        return create_time_entry(project_id, task_id, spent_date, kwargs):
+
+    def create_time_entry_via_duration(self, project_id, task_id, spent_date, **kwargs):
+        return create_time_entry(project_id, task_id, spent_date, kwargs):
+
+    def update_time_entry(self, time_entry_id, **kwargs):
+        url = '/time_entries/{0}'.format(time_entry_id)
+        return from_dict(data_class=TimeEntry, data=self._patch(url, data=kwargs))
+
+    def delete_time_entry_external_reference(self, time_entry_id):
+        return self._delete('/time_entries/{0}/external_reference'.format(time_entry_id))
+
+    def delete_time_entry(self, time_entry_id):
+        return self._delete('/time_entries/{0}'.format(time_entry_id))
+
+    def restart_a_stopped_time_entry(self, time_entry_id):
+        return from_dict(data_class=TimeEntry, data=self._patch('/time_entries/{0}/restart'.format(time_entry_id)))
+
+    def stop_a_running_time_entry(self, time_entry_id):
+        return from_dict(data_class=TimeEntry, data=self._patch('/time_entries/{0}/stop'.format(time_entry_id)))
 
     ## Projects
 

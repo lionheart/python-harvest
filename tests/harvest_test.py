@@ -24,9 +24,9 @@ import harvest
 """
 There is a sample test config.
 
-Copy it, name it test_config.txt and fill it out with your test details.
+Copy it, name it test_config.ini and fill it out with your test details.
 
-tests/test_config.txt is already in .gitignore
+tests/test_config.ini is already in .gitignore
 
 Just in case, the test config file looks like this:
 
