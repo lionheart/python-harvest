@@ -685,13 +685,14 @@ class Harvest(object):
     def get_project(self, project_id):
         return from_dict(data_class=Project, data=self._get('/projects/{0}'.format(project_id)))
 
-    def create_project(self, **kwargs):
-        # Example: client.create_project(project={"name": title, "client_id": client_id})
-        return self._post('/projects', data=kwargs)
+    def create_project(self, client_id, name, is_billable, bill_by, budget_by, **kwargs):
+        url = '/projects'
+        kwargs.update({'client_id': client_id, 'name': name, 'is_billable': is_billable, 'bill_by': bill_by, 'budget_by': budget_by})
+        return from_dict(data_class=Project, data=self._post(url, data=kwargs))
 
     def update_project(self, project_id, **kwargs):
         url = '/projects/{0}'.format(project_id)
-        return self._put(url, data=kwargs)
+        return from_dict(data_class=Project, data=self._patch(url, data=kwargs))
 
     def delete_project(self, project_id):
         return self._delete('/projects/{0}'.format(project_id))
