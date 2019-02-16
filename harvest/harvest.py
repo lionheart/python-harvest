@@ -189,17 +189,21 @@ class Harvest(object):
         kwargs.update({'recipients': recipients})
         return from_dict(data_class=InvoiceMessage, data=self._post(url, data=kwargs))
 
+    def mark_draft_invoice(self, invoice_id, event_type):
+        url = '/invoices/{0}/messages'.format(invoice_id)
+        return from_dict(data_class=InvoiceMessage, data=self._post(url, data={'event_type': event_type}))
+
     def mark_draft_invoice_as_sent(self, invoice_id):
-        return from_dict(data_class=InvoiceMessage, data=self._post('/invoices/{0}/messages'.format(invoice_id)))
+        return mark_draft_invoice(invoice_id, 'send')
 
     def mark_open_invoice_as_closed(self, invoice_id):
-        return from_dict(data_class=InvoiceMessage, data=self._post('/invoices/{0}/messages'.format(invoice_id), data='close'))
+        return mark_draft_invoice(invoice_id, 'close')
 
     def reopen_closed_invoice(self, invoice_id):
-        return from_dict(data_class=InvoiceMessage, data=self._post('/invoices/{0}/messages'.format(invoice_id), data='re-open'))
+        return mark_draft_invoice(invoice_id, 're-open')
 
     def mark_open_invoice_as_draft(self, invoice_id):
-        return from_dict(data_class=InvoiceMessage, data=self._post('/invoices/{0}/messages'.format(invoice_id), data='draft'))
+        return mark_draft_invoice(invoice_id, 'draft')
 
     def delete_invoice_message(self, invoice_id, message_id):
         self._delete('/invoices/{0}/messages/{1}'.format(invoice_id, message_id))
@@ -324,6 +328,34 @@ class Harvest(object):
             url = '{0}&updated_since={1}'.format(url, updated_since)
 
         return from_dict(data_class=EstimateMessages, data=self._get(url))
+
+    # recipients is a list of Recipient
+    def create_estimate_message(self, estimate_id, recipients, **kwargs):
+        url  = '/estimates/{0}/messages'.format(estimate_id)
+        recipient_parameters = []
+        for recipient in recipients:
+            recipient_parameters.append(remove_nones(asdict(recipients)))
+        kwargs.update({'recipients': recipient_parameters})
+        return from_dict(data_class=EstimateMessage, data=self._post(url, data=kwargs))
+
+    def delete_estimate_message(self, estimate_id, message_id):
+        self._delete('/estimates/{0}/messages/{1}'.format(estimate_id, message_id))
+
+    def mark_draft_estimate(self, estimate_id, event_type):
+        url  = '/estimates/{0}/messages'.format(estimate_id)
+        return from_dict(data_class=EstimateMessage, data=self._post(url, data={'event_type': event_type}))
+
+    def mark_draft_estimate_as_sent(self, estimate_id):
+        return mark_draft_estimate(estimate_id, 'send')
+
+    def mark_draft_estimate_as_accepted(self, estimate_id):
+        return mark_draft_estimate(estimate_id, 'accept')
+
+    def mark_draft_estimate_as_declined(self, estimate_id):
+        return mark_draft_estimate(estimate_id, 'decline')
+
+    def reopen_a_closed_estimate(self, estimate_id):
+        return mark_draft_estimate(estimate_id, 're-open')
 
     def estimates(self, page=1, per_page=100, client_id=None, updated_since=None, from_date=None, to_date=None, state=None):
         url = '/estimates?page={0}'.format(page)

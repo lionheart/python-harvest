@@ -289,6 +289,9 @@ class EstimateMessage:
     send_me_a_copy: bool = None
     created_at: str = None
     updated_at: str = None
+    event_type: str = None
+    subject: str = None
+    body: str = None
 
 @dataclass
 class Estimate:
