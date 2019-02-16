@@ -501,8 +501,8 @@ class Harvest(object):
         kwargs.update({'name': name})
         return from_dict(data_class=ExpenseCategory, data=self._post(url, data=kwargs))
 
-    def update_expense_category(self, **kwargs):
-        url = '/expense_categories'
+    def update_expense_category(self, expense_category_id, **kwargs):
+        url = '/expense_categories/{0}'.format(expense_category_id)
         return from_dict(data_class=ExpenseCategory, data=self._patch(url, data=kwargs))
 
     def delete_expense_category(self, expense_category_id):
@@ -524,15 +524,17 @@ class Harvest(object):
     def get_task(self, task_id):
         return from_dict(data_class=Task, data=self._get('/tasks/{0}'.format(task_id)))
 
-    def create_task(self, **kwargs):
-        return self._post('/tasks/', data=kwargs)
+    def create_task(self, name, **kwargs):
+        url = '/tasks'
+        kwargs.update({'name': name})
+        return from_dict(data_class=Task, data=self._post(url, data=kwargs))
 
-    def update_task(self, tasks_id, **kwargs):
-        url = '/tasks/{0}'.format(tasks_id)
-        return self._patch(url, data=kwargs)
+    def update_task(self, task_id, **kwargs):
+        url = '/tasks/{0}'.format(task_id)
+        return from_dict(data_class=Task, data=self._patch(url, data=kwargs))
 
-    def delete_task(self, tasks_id):
-        return self._delete('/tasks/{0}'.format(tasks_id))
+    def delete_task(self, task_id):
+        return self._delete('/tasks/{0}'.format(task_id))
 
     ## Time Entries
 
