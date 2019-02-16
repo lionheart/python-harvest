@@ -730,10 +730,14 @@ class Harvest(object):
 
         return from_dict(data_class=UserCostRates, data=self._get(url))
 
-    def user_cost_rate(self, user_id, cost_rate_id):
+    def get_user_cost_rate(self, user_id, cost_rate_id):
         url = '/users/{0}/cost_rates/{1}'.format(user_id, cost_rate_id)
-
         return from_dict(data_class=CostRate, data=self._get(url))
+
+    def create_user_cost_rate(self, user_id, amount):
+        url = '/users/{0}/cost_rates'.format(user_id)
+        kwargs.update({'amount': amount})
+        return from_dict(data_class=CostRate, data=self._post(url, data=kwargs))
 
     def project_assignments(self, user_id, page=1, per_page=100, updated_since=None):
         url = '/users/{0}/project_assignments'.format(user_id)
