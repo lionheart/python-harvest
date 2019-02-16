@@ -101,8 +101,9 @@ class Expense:
     client: Client = None
 
 @dataclass
-class EstimateLineItem:
-    id: Optional[int]
+class LineItem:
+    project: Optional[Project]
+    id: int = None
     kind: str = None
     description: str = None
     quantity: float = None
@@ -112,8 +113,23 @@ class EstimateLineItem:
     taxed2: bool = None
 
 @dataclass
-class InvoiceLineItem(EstimateLineItem):
-    project: Project = None
+class ExpenseImport:
+    summary_type: str
+    from: str = None
+    to: str = None
+    attach_receipt: str = None
+
+@dataclass
+class TimeImport:
+    summary_type: str
+    from: str = None
+    to: str = None
+
+@dataclass
+class LineItemImport:
+    time: Optional[TimeImport]
+    expenses: Optional[ExpenseImport]
+    project_ids: List[Project]
 
 @dataclass
 class Creator:
@@ -141,14 +157,14 @@ class Invoice:
     estimate: Optional[Estimate]
     retainer: Optional[str]
     sent_at: Optional[str]
-    line_items: List[InvoiceLineItem]
+    line_items: Optional[List[LineItem]]
+    notes: Optional[str]
     id: int = None
     client_key: str = None
     number: str = None
     amount: float = None
     due_amount: float = None
     subject: str = None
-    notes: str = None
     state: str = None
     issue_date: str = None
     due_date: str = None
@@ -158,6 +174,42 @@ class Invoice:
     currency: str = None
     creator: Creator = None
     client: ClientRef = None
+
+@dataclass
+class FreeFormInvoice:
+    notes: Optional[str]
+    client_id: int
+    retainer_id: int = None
+    estimate_id: int = None
+    number: str = None
+    purchase_order: str = None
+    tax: float = None
+    tax2: float = None
+    discount: float = None
+    subject: str = None
+    currency: str = None
+    issue_date: str = None
+    due_date: str = None
+    payment_term: str = None
+    line_items: List[LineItem] = None
+
+@dataclass
+class InvoiceImport:
+    notes: Optional[str]
+    line_items_import: Optional[LineItemImport]
+    client_id: int
+    retainer_id: int = None
+    estimate_id: int = None
+    number: str = None
+    purchase_order: str = None
+    tax: float = None
+    tax2: float = None
+    discount: float = None
+    subject: str = None
+    currency: str = None
+    issue_date: str = None
+    due_date: str = None
+    payment_term: str = None
 
 @dataclass
 class ClientContact:
@@ -250,7 +302,7 @@ class Estimate:
     sent_at: Optional[str]
     accepted_at: Optional[str]
     declined_at: Optional[str]
-    line_items: List[EstimateLineItem]
+    line_items: List[LineItem]
     id: int = None
     client_key: str = None
     number: str = None

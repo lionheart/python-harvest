@@ -15,6 +15,7 @@
 import json
 import requests
 from requests_oauthlib import OAuth2Session
+from dataclasses import asdict
 
 from dacite import from_dict
 
@@ -183,7 +184,26 @@ class Harvest(object):
 
         return from_dict(data_class=InvoiceMessages, data=self._get(url))
 
-        # TODO: need to come back and manage all the ways of interacting with ain invoice message
+    def create_invoice_message(self, invoice_id, recipients, **kwargs):
+        url  = '/invoices/{0}/messages'.format(invoice_id)
+        kwargs.update({'recipients': recipients})
+        return from_dict(data_class=InvoiceMessage, data=self._post(url, data=kwargs))
+
+    def mark_draft_invoice_as_sent(self, invoice_id):
+        return from_dict(data_class=InvoiceMessage, data=self._post('/invoices/{0}/messages'.format(invoice_id)))
+
+    def mark_open_invoice_as_closed(self, invoice_id):
+        return from_dict(data_class=InvoiceMessage, data=self._post('/invoices/{0}/messages'.format(invoice_id), data='close'))
+
+    def reopen_closed_invoice(self, invoice_id):
+        return from_dict(data_class=InvoiceMessage, data=self._post('/invoices/{0}/messages'.format(invoice_id), data='re-open'))
+
+    def mark_open_invoice_as_draft(self, invoice_id):
+        return from_dict(data_class=InvoiceMessage, data=self._post('/invoices/{0}/messages'.format(invoice_id), data='draft'))
+
+    def delete_invoice_message(self, invoice_id, message_id):
+        self._delete('/invoices/{0}/messages/{1}'.format(invoice_id, message_id))
+
 
     def invoice_payments(self, invoice_id, page=1, per_page=100, updated_since=None):
         url = '/invoices/{0}/payments'.format(invoice_id)
@@ -195,7 +215,14 @@ class Harvest(object):
 
         return from_dict(data_class=InvoicePayments, data=self._get(url))
 
-    # TODO: need to come back and manage all the ways of paying an invoice
+    def create_invoice_payment(self, invoice_id, amount, **kwargs):
+        url  = '/invoices/{0}/payments'.format(invoice_id)
+        kwargs.update({'amount': amount})
+        return from_dict(data_class=InvoicePayment, data=self._post(url, data=kwargs))
+
+    def delete_invoice_payment(self, invoice_id, payment_id):
+        self._delete('/invoices/{0}/payments/{1}'.format(invoice_id, payment_id))
+
 
     def invoices(self, page=1, per_page=100, client_id=None, project_id=None, updated_since=None, from_date=None, to_date=None, state=None):
         url = '/invoices?page={0}'.format(page)
@@ -219,9 +246,45 @@ class Harvest(object):
     def get_invoice(self, invoice_id):
         return from_dict(data_class=Invoice, data=self._get('/invoices/{0}'.format(invoice_id)))
 
-    def update_invoice(self, invoice_id, **kwargs):
+    # invoice is a dataclass invoice
+    def create_free_form_invoice(self, client_id, free_form_invoice):
+        invoice_dict = remove_nones(asdict(free_form_invoice))
+        return from_dict(data_class=Invoice, data=self._post('/invoices', data=invoice_dict))
+
+    def create_invoice_based_on_tracked_time_and_expenses(self, client_id, invoice_import):
+        return create_free_form_invoice(client_id, invoice_import)
+
+    # line_items is a list of LineItem
+    def update_invoice(self, invoice_id, line_items=None, **kwargs):
         url = '/invoices/{0}'.format(invoice_id)
-        return self._patch(url, data=kwargs)
+        if line_items is not None:
+            line_items_dict = remove_nones(asdict(line_items))
+            kwargs.update({'line_items' : [line_items_dict]})
+        return from_dict(data_class=Invoice, data=self._patch(url, data=kwargs))
+
+    # line_items is a list of LineItem
+    def create_invoice_line_item(self, invoice_id, line_items):
+        url = '/invoices/{0}'.format(invoice_id)
+
+        line_item_list = []
+        for item in line_items:
+            line_item_list.append(remove_nones(asdict(item)))
+        line_item_dict = {'line_items' : line_item_list}
+
+        return from_dict(data_class=Invoice, data=self._patch(url, data=line_item_dict))
+
+    def update_invoice_line_item(self, invoice_id, line_items):
+        return self.create_invoice_line_item(invoice_id, line_items)
+
+    # line_items is a list of LineItem.id's
+    def delete_invoice_line_items(self, invoice_id, line_item_ids):
+        url = '/invoices/{0}'.format(invoice_id)
+
+        line_items = []
+        for id in line_item_ids:
+            line_items.append({'id':id, '_destroy':True})
+
+        return from_dict(data_class=Invoice, data=self._patch(url, data=line_item_dict))
 
     def delete_invoice(self, invoice_id):
         return self._delete('/invoices/{0}'.format(invoice_id))
@@ -234,6 +297,21 @@ class Harvest(object):
             url = '{0}&updated_since={1}'.format(url, updated_since)
 
         return from_dict(data_class=InvoiceItemCategories, data=self._get(url))
+
+    def get_invoice_item_category(self, invoice_item_category):
+        url = '/invoice_item_categories/{0}'.format(invoice_item_category)
+        return from_dict(data_class=InvoiceItemCategory, data=self._get(url))
+
+    def create_invoice_item_category(self, invoice_item_category_name):
+        url = '/invoice_item_categories'
+        return from_dict(data_class=InvoiceItemCategory, data=self._post(url, data={'name': invoice_item_category_name}))
+
+    def update_invoice_item_category(self, invoice_category_id, invoice_item_category_name):
+        url = '/invoice_item_categories/{0}'.format(invoice_category_id)
+        return from_dict(data_class=InvoiceItemCategory, data=self._patch(url, data={'name': invoice_item_category_name}))
+
+    def delete_invoice(self, invoice_category_id):
+        return self._delete('/invoice_item_categories/{0}'.format(invoice_category_id))
 
      ## Estimates
 
@@ -581,3 +659,12 @@ def status():
     except:
         status = {}
     return status
+
+def remove_nones(obj):
+  if isinstance(obj, (list, tuple, set)):
+    return type(obj)(remove_nones(x) for x in obj if x is not None)
+  elif isinstance(obj, dict):
+    return type(obj)((remove_nones(k), remove_nones(v))
+      for k, v in obj.items() if k is not None and v is not None)
+  else:
+    return obj

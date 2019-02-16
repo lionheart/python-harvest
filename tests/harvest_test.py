@@ -50,6 +50,27 @@ class TestHarvest(unittest.TestCase):
         self.assertEqual("none", self.harvest.status['indicator'], "Harvest API is having problems")
 
 
+    # def test_create_invoice_based_on_tracked_time_and_expenses(self):
+    #     my_expense_import = harvest.ExpenseImport(summary_type="category")
+    #     my_time_import = harvest.TimeImport(summary_type="task", to="2017-03-31")
+    #     my_line_item_import = harvest.LineItemImport(project_ids=[19245190], time=my_time_import, expenses=my_expense_import)
+    #     my_invoice = harvest.InvoiceImport(notes=None, client_id=7439773, subject="ABC Project Quote 1", payment_term='upon receipt', line_items_import=my_line_item_import)
+    #     invoice = self.harvest.create_invoice_based_on_tracked_time_and_expenses(7439773, my_invoice)
+
+    # def test_create_free_form_invoice(self):
+    #     my_line_item = harvest.LineItem(project=None, kind="Service", description="ABC Project",unit_price=5000.0)
+    #     my_invoice = harvest.FreeFormInvoice(notes=None, client_id=7439772, subject="ABC Project Quote 1", due_date="2017-07-27", line_items=[my_line_item])
+    #     client = self.harvest.create_free_form_invoice(7439772, my_invoice)
+
+    # def test_delete_client(self):
+    #     client = self.harvest.delete_client(7811346)
+    #
+    # def test_update_client(self):
+    #     client = self.harvest.update_client(7811346, address='Alice Springs')
+    #
+    # def test_create_invoice_message(self):
+    #     client = self.harvest.create_invoice_message()
+
     # def test_delete_client(self):
     #     client = self.harvest.delete_client(7811346)
     #
