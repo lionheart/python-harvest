@@ -50,35 +50,52 @@ class TestHarvest(unittest.TestCase):
     def test_status_not_down(self):
         self.assertEqual("none", self.harvest.status['indicator'], "Harvest API is having problems")
 
-    def test_client(self):
-        original_clients = self.harvest.clients()
-        original_client_count = original_clients.total_entries
+    # def test_client(self):
+    #     original_clients = self.harvest.clients()
+    #     original_client_count = original_clients.total_entries
+    #
+    #     client = {'name':'Pinky', 'currency':'USD', 'is_active':True, 'address':'ACME Labs'}
+    #     new_client = self.harvest.create_client(**client)
+    #
+    #     clients = self.harvest.clients()
+    #
+    #     client_count = clients.total_entries
+    #
+    #     self.assertTrue(client_count > original_client_count, "We didn't add a client.")
+    #
+    #     client_record = self.harvest.get_client(new_client.id)
+    #
+    #     self.assertTrue(client['name'] == client_record.name, "No such client as the one we tried to make.")
+    #
+    #     self.harvest.update_client(new_client.id, name='The Brain')
+    #
+    #     updated_client_record = self.harvest.get_client(new_client.id)
+    #
+    #     self.assertFalse(updated_client_record.name == client['name'], "The updated client record retained the original name.")
+    #     self.assertTrue(updated_client_record.name == 'The Brain', "The updated client record does not have the name we tried to set.")
+    #
+    #     self.harvest.delete_client(new_client.id)
 
-        client = {'name':'Pinky', 'currency':'USD', 'is_active':True, 'address':'ACME Labs'}
-        new_client = self.harvest.create_client(**client)
+    def test_client_contact(self):
+        sample_client_a = 7439772
 
-        clients = self.harvest.clients()
+        client = asdict(self.harvest.get_client(sample_client_a))
 
-        client_count = clients.total_entries
+        contact_dict = {'client': client, 'title': 'Mr', 'first_name': 'S', 'last_name': 'quiggle', 'email': 'mr.squiggle@example.com', 'phone_office': '555 Whilloghby', 'phone_mobile': '04123456789', 'fax': 'beep squeel'}
 
-        self.assertTrue(client_count > original_client_count, "We didn't add a client.")
+        original_client_contacts = self.harvest.client_contacts()
+        original_client_contacts_count = original_client_contacts.total_entries
 
-        client_record = self.harvest.get_client(new_client.id)
-        print(client_record)
-        self.assertTrue(client['name'] == client_record.name, "No such client as the one we tried to make.")
+        new_client_contact = self.harvest.create_client_contact(sample_client_a, **contact_dict)
 
-        self.harvest.update_client(new_client.id, name='The Brain')
+        updated_client_contacts = self.harvest.client_contacts()
+        updated_client_contacts_count = updated_client_contacts.total_entries
 
-        updated_client_record = self.harvest.get_client(new_client.id)
+        client_contact = self.harvest.get_client_contact(new_client_contact.id)
 
-        print(updated_client_record)
+        self.harvest.update_client_contact(client_contact.id, fax='Not connected')
 
-        self.assertFalse(updated_client_record.name == client['name'], "The updated client record retained the original name.")
-        self.assertTrue(updated_client_record.name == 'The Brain', "The updated client record does not have the name we tried to set.")
-
-        self.harvest.delete_client(new_client.id)
-
-
+        delete_client_contact(client_contact.id)
 
 # def test_create_invoice_based_on_tracked_time_and_expenses(self):
 #     my_expense_import = harvest.ExpenseImport(summary_type="category")
