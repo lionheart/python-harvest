@@ -697,7 +697,6 @@ class Harvest(object):
     def delete_project(self, project_id):
         return self._delete('/projects/{0}'.format(project_id))
 
-
      ## Roles
 
     def roles(self, page=1, per_page=100):
@@ -706,8 +705,21 @@ class Harvest(object):
 
         return from_dict(data_class=Roles, data=self._get(url))
 
-    def get_role(self, project_id):
-        return from_dict(data_class=Role, data=self._get('/roles/{0}'.format(project_id)))
+    def get_role(self, role_id):
+        return from_dict(data_class=Role, data=self._get('/roles/{0}'.format(role_id)))
+
+    def create_role(self, name, **kwargs):
+        url = '/roles'
+        kwargs.update({'name': name})
+        return from_dict(data_class=Role, data=self._post(url, data=kwargs))
+
+    def update_role(self, role_id, name, **kwargs):
+        url = '/roles/{0}'.format(role_id)
+        kwargs.update({'name': name})
+        return from_dict(data_class=Role, data=self._patch(url, data=kwargs))
+
+    def delete_role(self, role_id):
+        return self._delete('/roles/{0}'.format(role_id))
 
      ## Users
 
