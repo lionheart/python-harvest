@@ -334,7 +334,7 @@ class Harvest(object):
         url  = '/estimates/{0}/messages'.format(estimate_id)
         recipient_parameters = []
         for recipient in recipients:
-            recipient_parameters.append(remove_nones(asdict(recipients)))
+            recipient_parameters.append(remove_nones(asdict(recipient)))
         kwargs.update({'recipients': recipient_parameters})
         return from_dict(data_class=EstimateMessage, data=self._post(url, data=kwargs))
 
@@ -372,6 +372,54 @@ class Harvest(object):
 
         return from_dict(data_class=Estimates, data=self._get(url))
 
+    def get_estimte(self, estimate_id):
+        url = '/estimates/{0}'.format(estimate_id)
+        return from_dict(data_class=Estimate, data=self._get(url))
+
+    # line_items is a list of LineItem
+    def create_estimate(self, client_id, line_items, **kwargs):
+        url  = '/estimates'
+        line_item_list = []
+        for item in line_items:
+            line_item_list.append(remove_nones(asdict(item)))
+        kwargs.update({'line_items': line_item_list})
+        return from_dict(data_class=Estimate, data=self._post(url, data=kwargs))
+
+    # line_items is a list of LineItem
+    def update_estimate(self, estimate_id, line_items=None, **kwargs):
+        url = '/estimates/{0}'.format(estimate_id)
+        if line_items is not None:
+            line_items_dict = remove_nones(asdict(line_items))
+            kwargs.update({'line_items' : [line_items_dict]})
+        return from_dict(data_class=Estimate, data=self._patch(url, data=kwargs))
+
+    # line_items is a list of LineItem
+    def create_estimate_line_item(self, estimate_id, line_items):
+        url = '/estimates/{0}'.format(estimate_id)
+
+        line_item_list = []
+        for item in line_items:
+            line_item_list.append(remove_nones(asdict(item)))
+        line_item_dict = {'line_items' : line_item_list}
+
+        return from_dict(data_class=Estimate, data=self._patch(url, data=line_item_dict))
+
+    def update_estimate_line_item(self, estimate_id, line_items):
+        return create_estimate_line_item(estimate_id, line_items)
+
+    # line_items is a list of LineItem.id's
+    def delete_estimate_line_items(self, estimate_id, line_item_ids):
+        url = '/estimates/{0}'.format(estimate_id)
+
+        line_items = []
+        for id in line_item_ids:
+            line_items.append({'id':id, '_destroy':True})
+
+        return from_dict(data_class=Estimate, data=self._patch(url, data=line_item_dict))
+
+    def delete_estimate(self, estimate_id):
+        return self._delete('/estimates/{0}'.format(estimate_id))
+
     def estimate_item_categories(self, page=1, per_page=100, updated_since=None):
         url = '/estimate_item_categories?page={0}'.format(page)
         url = '{0}&per_page={1}'.format(url, per_page)
@@ -380,6 +428,21 @@ class Harvest(object):
             url = '{0}&updated_since={1}'.format(url, updated_since)
 
         return from_dict(data_class=EstimateItemCategories, data=self._get(url))
+
+    def get_estimate_item_category(self, estimate_item_category_id):
+        url = '/estimate_item_categories/{0}'.format(estimate_item_category_id)
+        return from_dict(data_class=EstimateItemCategory, data=self._get(url))
+
+    def create_estimate_item_category(self, estimate_item_category_name):
+        url = '/estimate_item_categories'
+        return from_dict(data_class=EstimateItemCategory, data=self._post(url, data={'name': estimate_item_category_name}))
+
+    def update_estimate_item_category(self, estimate_item_category_id, estimate_item_category_name):
+        url = '/estimate_item_categories/{0}'.format(estimate_item_category_id)
+        return from_dict(data_class=EstimateItemCategory, data=self._patch(url, data={'name': estimate_item_category_name}))
+
+    def delete_estimate_item_category(self, estimate_item_id):
+        return self._delete('/estimate_item_categories/{0}'.format(estimate_item_id))
 
     ## Expenses
 
@@ -404,15 +467,20 @@ class Harvest(object):
 
         return from_dict(data_class=Expenses, data=self._get(url))
 
-    def get_expense(self, invoice_id):
-        return from_dict(data_class=Expense, data=self._get('/expenses/{0}'.format(invoice_id)))
+    def get_expense(self, expense_id):
+        return from_dict(data_class=Expense, data=self._get('/expenses/{0}'.format(expense_id)))
 
-    def update_expense(self, invoice_id, **kwargs):
-        url = '/expenses/{0}'.format(invoice_id)
-        return self._patch(url, data=kwargs)
+    def create_expense(self, project_id, expense_category_id, spent_date, **kwargs):
+        url = '/expenses'
+        kwargs.update({'project_id': project_id, 'expense_category_id': expense_category_id, 'spent_date': spent_date})
+        return from_dict(data_class=Expense, data=self._post(url, data=kwargs))
 
-    def delete_expense(self, invoice_id):
-        return self._delete('/expenses/{0}'.format(invoice_id))
+    def update_expense(self, expense_id, **kwargs):
+        url = '/expenses/{0}'.format(expense_id)
+        return from_dict(data_class=Expense, data=self._patch(url, data=kwargs))
+
+    def delete_expense(self, expense_id):
+        return self._delete('/expenses/{0}'.format(expense_id))
 
     def expense_categories(self, page=1, per_page=100, is_active=None, updated_since=None):
         url = '/expense_categories?page={0}'.format(page)
