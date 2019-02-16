@@ -772,6 +772,17 @@ class Harvest(object):
     def currently_authenticated_user(self):
         return from_dict(data_class=User, data=self._get('/users/me'))
 
+    def create_user(self, first_name, last_name, email, **kwargs):
+        url = '/users'
+        kwargs.update({'first_name': first_name, 'last_name': last_name, 'email': email})
+        return from_dict(data_class=User, data=self._post(url, data=kwargs))
+
+    def update_user(self, user_id, **kwargs):
+        url = '/users/{0}'.format(user_id)
+        return from_dict(data_class=User, data=self._patch(url, data=kwargs))
+
+    def delete_user(self, user_id):
+        return self._delete('/users/{0}'.format(user_id))
 
     def _get(self, path='/', data=None):
         return self._request('GET', path, data)
