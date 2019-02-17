@@ -582,13 +582,18 @@ class Harvest(object):
     def create_time_entry(self, project_id, task_id, spent_date, **kwargs):
         url = '/time_entries'
         kwargs.update({'project_id': project_id, 'task_id': task_id, 'spent_date': spent_date})
-        return from_dict(data_class=TimeEntry, data=self._post(url, data=kwargs))
+        response = self._post(url, data=kwargs)
+
+        if 'message' in response.keys():
+            return from_dict(data_class=ErrorMessage, data=response)
+
+        return from_dict(data_class=TimeEntry, data=response)
 
     def create_time_entry_via_start_and_end_time(self, project_id, task_id, spent_date, **kwargs):
-        return create_time_entry(project_id, task_id, spent_date, kwargs)
+        return self.create_time_entry(project_id, task_id, spent_date, kwargs)
 
     def create_time_entry_via_duration(self, project_id, task_id, spent_date, **kwargs):
-        return create_time_entry(project_id, task_id, spent_date, kwargs)
+        return self.create_time_entry(project_id, task_id, spent_date, **kwargs)
 
     def update_time_entry(self, time_entry_id, **kwargs):
         url = '/time_entries/{0}'.format(time_entry_id)
@@ -675,13 +680,19 @@ class Harvest(object):
     def create_task_assignment(self, project_id, task_id, **kwargs):
         url = '/projects/{0}/task_assignments'.format(project_id)
         kwargs.update({'task_id': task_id})
-        return from_dict(data_class=TaskAssignment, data=self._post(url, data=kwargs))
+
+        response = self._post(url, data=kwargs)
+
+        if 'message' in response.keys():
+            return from_dict(data_class=ErrorMessage, data=response)
+
+        return from_dict(data_class=TaskAssignment, data=response)
 
     def update_task_assignment(self, project_id, task_assignment_id, **kwargs):
         url = '/projects/{0}/task_assignments/{1}'.format(project_id, task_assignment_id)
         return from_dict(data_class=TaskAssignment, data=self._patch(url, data=kwargs))
 
-    def delete_user_assignment(self, project_id, task_assignment_id):
+    def delete_task_assignment(self, project_id, task_assignment_id):
         return self._delete('/projects/{0}/task_assignments/{1}'.format(project_id, task_assignment_id))
 
     def projects(self, page=1, per_page=100, client_id=None, is_active=None, updated_since=None):

@@ -56,12 +56,39 @@ class TestHarvest(unittest.TestCase):
     def test_project(self):
         pass
 
-    def test_tasks(self):
-        tasks = self.harvest.tasks()
+    def test_timesheets(self):
+        project = self.harvest.create_project(self.sample_client_a, "Your New Project", True, "Project", "project")
         new_task = self.harvest.create_task('Integrate With Harvest')
-        task = self.harvest.get_task(new_task.id)
-        updated_task = self.harvest.update_task(task.id, default_hourly_rate=100.00)
-        self.harvest.delete_task(updated_task.id)
+        project_task_assignment = self.harvest.create_task_assignment(project.id, new_task.id, hourly_rate=150.00)
+
+        time_entries = self.harvest.time_entries()
+
+        new_time_entry = self.harvest.create_time_entry_via_duration(project.id, new_task.id, '2019-02-01', hours=7.5)
+        updated_time_entry = self.harvest.update_time_entry(new_time_entry.id, hours=8.0)
+        time_entry = self.harvest.get_time_entry(updated_time_entry.id)
+
+        # external reference currently un-tested
+        # updated_time_entry = self.harvest.update_time_entry(time_entry.id, external_reference={'id': '', 'group_id': '', 'permalink': ''})
+        # updated_time_entry = self.harvest.delete_time_entry_external_reference(time_entry.id)
+
+        self.harvest.delete_time_entry(time_entry.id)
+
+        running_time_entry = self.harvest.create_time_entry(project.id, new_task.id, '2019-02-01')
+        running_time_entry = self.harvest.stop_a_running_time_entry(running_time_entry.id)
+        running_time_entry = self.harvest.restart_a_stopped_time_entry(running_time_entry.id)
+        running_time_entry = self.harvest.stop_a_running_time_entry(running_time_entry.id)
+        self.harvest.delete_time_entry(running_time_entry.id)
+
+        self.harvest.delete_task_assignment(project.id, new_task.id)
+        self.harvest.delete_project(project.id)
+        self.harvest.delete_task(new_task.id)
+
+    # def test_tasks(self):
+    #     tasks = self.harvest.tasks()
+    #     new_task = self.harvest.create_task('Integrate With Harvest')
+    #     task = self.harvest.get_task(new_task.id)
+    #     updated_task = self.harvest.update_task(task.id, default_hourly_rate=100.00)
+    #     self.harvest.delete_task(updated_task.id)
 
     # def test_expense_categories(self):
     #     expense_categories = self.harvest.expense_categories()
