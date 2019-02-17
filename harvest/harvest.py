@@ -636,11 +636,11 @@ class Harvest(object):
 
         return from_dict(data_class=UserAssignments, data=self._get(url))
 
-    def user_assignment(self, project_id, user_assignment_id):
+    def get_user_assignment(self, project_id, user_assignment_id):
         return from_dict(data_class=UserAssignment, data=self._get('/projects/{0}/user_assignments/{1}'.format(project_id, user_assignment_id)))
 
-    def create_user_assignment(self, user_id, **kwargs):
-        url = '/projects/{0}/user_assignments'.format(user_id)
+    def create_user_assignment(self, project_id, user_id, **kwargs):
+        url = '/projects/{0}/user_assignments'.format(project_id)
         kwargs.update({'user_id': user_id})
         return from_dict(data_class=UserAssignment, data=self._post(url, data=kwargs))
 
@@ -801,7 +801,12 @@ class Harvest(object):
     def create_user(self, first_name, last_name, email, **kwargs):
         url = '/users'
         kwargs.update({'first_name': first_name, 'last_name': last_name, 'email': email})
-        return from_dict(data_class=User, data=self._post(url, data=kwargs))
+        response = self._post(url, data=kwargs)
+
+        if 'message' in response.keys():
+            return from_dict(data_class=ErrorMessage, data=response)
+
+        return from_dict(data_class=User, data=response)
 
     def update_user(self, user_id, **kwargs):
         url = '/users/{0}'.format(user_id)

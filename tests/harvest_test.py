@@ -56,20 +56,36 @@ class TestHarvest(unittest.TestCase):
     def test_project(self):
         pass
 
-    def test_project_task_assignments(self):
-        task_assignments = self.harvest.task_assignments()
+    def test_project_user_assignments(self):
+        user_assignments = self.harvest.user_assignments()
 
         project = self.harvest.create_project(self.sample_client_a, "Your New Project", True, "Project", "project")
-        projects = self.harvest.project_task_assignments(project.id)
-        new_task = self.harvest.create_task('Integrate With Harvest')
-        
-        project_task_assignment = self.harvest.create_task_assignment(project.id, new_task.id, hourly_rate=150.00)
-        task_assignment = self.harvest.get_task_assignment(project.id, project_task_assignment.id)
-        updated_task_assignment = self.harvest.update_task_assignment(project.id, project_task_assignment.id, hourly_rate=100.00)
+        user = self.harvest.create_user('George','Frank','george@example.com')
 
-        self.harvest.delete_task_assignment(project.id, new_task.id)
-        self.harvest.delete_task(new_task.id)
+        user_assignment = self.harvest.create_user_assignment(project.id, user.id)
+        self.harvest.update_user_assignment(project.id, user_assignment.id, hourly_rate=200.00)
+        updated_user_assignment = self.harvest.get_user_assignment(project.id, user_assignment.id)
+
+        project_user_assignments = self.harvest.project_user_assignments(project.id)
+
+        self.harvest.delete_user_assignment(project.id, user_assignment.id)
+        self.harvest.delete_user(user.id)
         self.harvest.delete_project(project.id)
+
+    # def test_project_task_assignments(self):
+    #     task_assignments = self.harvest.task_assignments()
+    #
+    #     project = self.harvest.create_project(self.sample_client_a, "Your New Project", True, "Project", "project")
+    #     projects = self.harvest.project_task_assignments(project.id)
+    #     new_task = self.harvest.create_task('Integrate With Harvest')
+    #
+    #     project_task_assignment = self.harvest.create_task_assignment(project.id, new_task.id, hourly_rate=150.00)
+    #     task_assignment = self.harvest.get_task_assignment(project.id, project_task_assignment.id)
+    #     updated_task_assignment = self.harvest.update_task_assignment(project.id, project_task_assignment.id, hourly_rate=100.00)
+    #
+    #     self.harvest.delete_task_assignment(project.id, new_task.id)
+    #     self.harvest.delete_task(new_task.id)
+    #     self.harvest.delete_project(project.id)
 
     # def test_projects(self):
     #     projects = self.harvest.projects()

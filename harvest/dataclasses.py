@@ -393,12 +393,12 @@ class TimeEntry:
 @dataclass
 class UserAssignment:
     budget: Optional[float]
+    hourly_rate: Optional[float]
     id: int = None
     is_project_manager: bool = None
     is_active: bool = None
     created_at: str = None
     updated_at: str = None
-    hourly_rate: float = None
     project: Project = None
     user: User = None
 
@@ -472,6 +472,8 @@ class ProjectAssignment:
 
 @dataclass
 class User:
+    default_hourly_rate: Optional[float]
+    cost_rate: Optional[float]
     id: int = None
     first_name: str = None
     last_name: str = None
@@ -489,8 +491,6 @@ class User:
     created_at: str = None
     updated_at: str = None
     weekly_capacity: int = None
-    default_hourly_rate: float = None
-    cost_rate: float = None
     roles: List[str] = None
     avatar_url: str = None
 
