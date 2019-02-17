@@ -56,21 +56,34 @@ class TestHarvest(unittest.TestCase):
     def test_project(self):
         pass
 
-    def test_project_user_assignments(self):
-        user_assignments = self.harvest.user_assignments()
+    def test_roles(self):
+        user1 = self.harvest.create_user('George','Frank','george@example.com')
+        user2 = self.harvest.create_user('Your','Name','yourname@example.com')
+        roles = self.harvest.roles()
+        new_role = self.harvest.create_role('Interface Developer', user_ids=[user1.id])
+        self.harvest.update_role(new_role.id, 'Interface Developer', user_ids=[user2.id])
+        updated_role = self.harvest.get_role(new_role.id)
 
-        project = self.harvest.create_project(self.sample_client_a, "Your New Project", True, "Project", "project")
-        user = self.harvest.create_user('George','Frank','george@example.com')
+        self.harvest.delete_role(updated_role.id)
 
-        user_assignment = self.harvest.create_user_assignment(project.id, user.id)
-        self.harvest.update_user_assignment(project.id, user_assignment.id, hourly_rate=200.00)
-        updated_user_assignment = self.harvest.get_user_assignment(project.id, user_assignment.id)
+        self.harvest.delete_user(user1.id)
+        self.harvest.delete_user(user2.id)
 
-        project_user_assignments = self.harvest.project_user_assignments(project.id)
-
-        self.harvest.delete_user_assignment(project.id, user_assignment.id)
-        self.harvest.delete_user(user.id)
-        self.harvest.delete_project(project.id)
+    # def test_project_user_assignments(self):
+    #     user_assignments = self.harvest.user_assignments()
+    #
+    #     project = self.harvest.create_project(self.sample_client_a, "Your New Project", True, "Project", "project")
+    #     user = self.harvest.create_user('George','Frank','george@example.com')
+    #
+    #     user_assignment = self.harvest.create_user_assignment(project.id, user.id)
+    #     self.harvest.update_user_assignment(project.id, user_assignment.id, hourly_rate=200.00)
+    #     updated_user_assignment = self.harvest.get_user_assignment(project.id, user_assignment.id)
+    #
+    #     project_user_assignments = self.harvest.project_user_assignments(project.id)
+    #
+    #     self.harvest.delete_user_assignment(project.id, user_assignment.id)
+    #     self.harvest.delete_user(user.id)
+    #     self.harvest.delete_project(project.id)
 
     # def test_project_task_assignments(self):
     #     task_assignments = self.harvest.task_assignments()
