@@ -239,6 +239,8 @@ class InvoiceMessage:
     send_reminder_on: Optional[bool]
     event_type: Optional[str]
     recipients: List[Recipient]
+    subject: Optional[str]
+    body: Optional[str]
     id: int = None
     sent_by: str = None
     sent_by_email: str = None
@@ -251,16 +253,16 @@ class InvoiceMessage:
     created_at: str = None
     updated_at: str = None
     attach_pdf: bool = None
-    subject: str = None
-    body: str = None
 
 @dataclass
 class PaymentGateway:
-    id: int = None
-    name: str = None
+    id: Optional[int]
+    name: Optional[str]
 
 @dataclass
 class InvoicePayment:
+    transaction_id: Optional[str]
+    payment_gateway: Optional[PaymentGateway]
     id: int = None
     amount: float = None
     paid_at: str = None
@@ -268,10 +270,9 @@ class InvoicePayment:
     recorded_by: str = None
     recorded_by_email: str = None
     notes: str = None
-    transaction_id: str = None
     created_at: str = None
     updated_at: str = None
-    payment_gateway: PaymentGateway = None
+
 
 @dataclass
 class InvoiceItemCategory:
