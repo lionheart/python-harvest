@@ -56,18 +56,38 @@ class TestHarvest(unittest.TestCase):
     def test_project(self):
         pass
 
-    def test_roles(self):
-        user1 = self.harvest.create_user('George','Frank','george@example.com')
-        user2 = self.harvest.create_user('Your','Name','yourname@example.com')
-        roles = self.harvest.roles()
-        new_role = self.harvest.create_role('Interface Developer', user_ids=[user1.id])
-        self.harvest.update_role(new_role.id, 'Interface Developer', user_ids=[user2.id])
-        updated_role = self.harvest.get_role(new_role.id)
+    def test_cost_rates(self):
+        user = self.harvest.create_user('George', 'Frank', 'george@example.com')
 
-        self.harvest.delete_role(updated_role.id)
+        user_cost_rate = self.harvest.create_user_cost_rate(user.id, 10.00)
+        user_cost_rate = self.harvest.get_user_cost_rate(user.id, user_cost_rate.id)
 
-        self.harvest.delete_user(user1.id)
-        self.harvest.delete_user(user2.id)
+        cost_rates = self.harvest.user_cost_rates(user.id)
+
+        # self.harvest.delete_user(user.id)
+
+    # def test_users(self):
+    #     users = self.harvest.users()
+    #
+    #     user = self.harvest.create_user('George', 'Frank', 'george@example.com')
+    #     self.harvest.update_user(user.id, telephone='04123456789')
+    #     updated_user = self.harvest.get_user(user.id)
+    #     myself = self.harvest.get_currently_authenticated_user()
+    #
+    #     self.harvest.delete_user(updated_user.id)
+
+    # def test_roles(self):
+    #     user1 = self.harvest.create_user('George','Frank','george@example.com')
+    #     user2 = self.harvest.create_user('Your','Name','yourname@example.com')
+    #     roles = self.harvest.roles()
+    #     new_role = self.harvest.create_role('Interface Developer', user_ids=[user1.id])
+    #     self.harvest.update_role(new_role.id, 'Interface Developer', user_ids=[user2.id])
+    #     updated_role = self.harvest.get_role(new_role.id)
+    #
+    #     self.harvest.delete_role(updated_role.id)
+    #
+    #     self.harvest.delete_user(user1.id)
+    #     self.harvest.delete_user(user2.id)
 
     # def test_project_user_assignments(self):
     #     user_assignments = self.harvest.user_assignments()

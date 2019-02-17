@@ -760,7 +760,7 @@ class Harvest(object):
         url = '/users/{0}/cost_rates/{1}'.format(user_id, cost_rate_id)
         return from_dict(data_class=CostRate, data=self._get(url))
 
-    def create_user_cost_rate(self, user_id, amount):
+    def create_user_cost_rate(self, user_id, amount, **kwargs):
         url = '/users/{0}/cost_rates'.format(user_id)
         kwargs.update({'amount': amount})
         return from_dict(data_class=CostRate, data=self._post(url, data=kwargs))
@@ -795,7 +795,7 @@ class Harvest(object):
     def get_user(self, user_id):
         return from_dict(data_class=User, data=self._get('/users/{0}'.format(user_id)))
 
-    def currently_authenticated_user(self):
+    def get_currently_authenticated_user(self):
         return from_dict(data_class=User, data=self._get('/users/me'))
 
     def create_user(self, first_name, last_name, email, **kwargs):
