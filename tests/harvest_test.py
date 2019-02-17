@@ -56,6 +56,13 @@ class TestHarvest(unittest.TestCase):
     def test_project(self):
         pass
 
+    def test_tasks(self):
+        tasks = self.harvest.tasks()
+        new_task = self.harvest.create_task('Integrate With Harvest')
+        task = self.harvest.get_task(new_task.id)
+        updated_task = self.harvest.update_task(task.id, default_hourly_rate=100.00)
+        self.harvest.delete_task(updated_task.id)
+
     # def test_expense_categories(self):
     #     expense_categories = self.harvest.expense_categories()
     #     expense_category = self.harvest.create_expense_category('Pass Through 00', unit_name='kilograms', unit_price=10.00)
