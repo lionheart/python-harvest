@@ -53,17 +53,14 @@ class TestHarvest(unittest.TestCase):
     def test_status_not_down(self):
         self.assertEqual("none", self.harvest.status['indicator'], "Harvest API is having problems")
 
-    def test_project(self):
-        pass
-
-    def test_user_project_assignments(self):
-        user = self.harvest.create_user('George', 'Frank', 'george@example.com')
-
-        user_project_assignments = self.harvest.project_assignments(user.id)
-        my_project_assignments = self.harvest.my_project_assignments()
-
-        self.harvest.delete_user(user.id)
-
+    # def test_user_project_assignments(self):
+    #     user = self.harvest.create_user('George', 'Frank', 'george@example.com')
+    #
+    #     user_project_assignments = self.harvest.project_assignments(user.id)
+    #     my_project_assignments = self.harvest.my_project_assignments()
+    #
+    #     self.harvest.delete_user(user.id)
+    #
     # def test_cost_rates(self):
     #     user = self.harvest.create_user('George', 'Frank', 'george@example.com')
     #
@@ -73,7 +70,7 @@ class TestHarvest(unittest.TestCase):
     #     cost_rates = self.harvest.user_cost_rates(user.id)
     #
     #     self.harvest.delete_user(user.id)
-
+    #
     # def test_users(self):
     #     users = self.harvest.users()
     #
@@ -83,7 +80,7 @@ class TestHarvest(unittest.TestCase):
     #     myself = self.harvest.get_currently_authenticated_user()
     #
     #     self.harvest.delete_user(updated_user.id)
-
+    #
     # def test_roles(self):
     #     user1 = self.harvest.create_user('George','Frank','george@example.com')
     #     user2 = self.harvest.create_user('Your','Name','yourname@example.com')
@@ -96,7 +93,7 @@ class TestHarvest(unittest.TestCase):
     #
     #     self.harvest.delete_user(user1.id)
     #     self.harvest.delete_user(user2.id)
-
+    #
     # def test_project_user_assignments(self):
     #     user_assignments = self.harvest.user_assignments()
     #
@@ -112,7 +109,7 @@ class TestHarvest(unittest.TestCase):
     #     self.harvest.delete_user_assignment(project.id, user_assignment.id)
     #     self.harvest.delete_user(user.id)
     #     self.harvest.delete_project(project.id)
-
+    #
     # def test_project_task_assignments(self):
     #     task_assignments = self.harvest.task_assignments()
     #
@@ -127,18 +124,16 @@ class TestHarvest(unittest.TestCase):
     #     self.harvest.delete_task_assignment(project.id, new_task.id)
     #     self.harvest.delete_task(new_task.id)
     #     self.harvest.delete_project(project.id)
-
+    #
     # def test_projects(self):
     #     projects = self.harvest.projects()
     #
     #     project = self.harvest.create_project(self.sample_client_a, "Your New Project", True, "Project", "project")
     #     self.harvest.update_project(project.id, budget_by='none')
     #     updated_project = self.harvest.get_project(project.id)
-    #     print(project)
-    #     print(updated_project)
     #
     #     self.harvest.delete_project(project.id)
-
+    #
     # def test_timesheets(self):
     #     project = self.harvest.create_project(self.sample_client_a, "Your New Project", True, "Project", "project")
     #     new_task = self.harvest.create_task('Integrate With Harvest')
