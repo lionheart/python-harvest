@@ -53,13 +53,54 @@ class TestHarvest(unittest.TestCase):
     def test_status_not_down(self):
         self.assertEqual("none", self.harvest.status['indicator'], "Harvest API is having problems")
 
-    def test_invoice_categories(self):
-        categories = self.harvest.invoice_item_categories()
-        invoice_item_category = self.harvest.create_invoice_item_category('Tabasco')
-        invoice_item_category = self.harvest.get_invoice_item_category(invoice_item_category.id)
-        self.harvest.update_invoice_item_category(invoice_item_category.id, 'Pass through')
-        self.harvest.delete_invoice_item_category(invoice_item_category.id)
+    # def test_estimate_item_category(self):
+    #     estimate_item_categories = self.harvest.estimate_item_categories()
+    #
+    #     category = self.harvest.create_estimate_item_category('Tabasco')
+    #     self.harvest.update_estimate_item_category(category.id, 'Pass through')
+    #     self.harvest.delete_estimate_item_category(category.id)
 
+    # def test_estimates_messages(self):
+    #     estimate_parameters = {"subject":"ABC Project Quote","line_items":[{"kind":"Service","description":"ABC Project Quote","unit_price":5000.0}]}
+    #     estimate = self.harvest.create_estimate(self.sample_client_a, **estimate_parameters)
+    #     self.harvest.create_estimate_message(estimate.id, [{'name': 'S quiggle', 'email': 'mr.squiggle@example.com'}])
+    #
+    #     message_parameters = {"subject":"Estimate #1001","body":"Here is our estimate.","send_me_a_copy":True}
+    #     new_estimate_message = self.harvest.create_estimate_message(estimate.id, [{"name":"Richard Roe","email":"richardroe@example.com"}], **message_parameters)
+    #     estimate_messages = self.harvest.estimate_messages(estimate.id)
+    #     self.harvest.delete_estimate_message(estimate.id, new_estimate_message.id)
+    #
+    #     self.harvest.mark_open_estimate_as_declined(estimate.id)
+    #
+    # def test_estimates(self):
+    #     estimates = self.harvest.estimates()
+    #
+    #     estimate_parameters = {"subject":"ABC Project Quote","line_items":[{"kind":"Service","description":"ABC Project Quote","unit_price":5000.0}]}
+    #
+    #     new_estimate = self.harvest.create_estimate(self.sample_client_a, **estimate_parameters)
+    #     new_estimate = self.harvest.get_estimte(new_estimate.id)
+    #
+    #     updated_estimate = self.harvest.update_estimate(new_estimate.id, purchase_order="2345")
+    #
+    #     new_estimate_line_item = [{"kind":"Service","description":"Another Project","unit_price":1000.0}]
+    #
+    #     estimate_with_new_line_item = self.harvest.create_estimate_line_item(updated_estimate.id, new_estimate_line_item)
+    #
+    #     for item in estimate_with_new_line_item.line_items:
+    #         updated_item = {'id':item.id, 'unit_price': 1.0}
+    #         self.harvest.update_estimate_line_item(estimate_with_new_line_item.id, updated_item)
+    #
+    #     self.harvest.delete_estimate_line_items(estimate_with_new_line_item.id, estimate_with_new_line_item.line_items)
+    #
+    #     self.harvest.delete_estimate(estimate_with_new_line_item.id)
+    #
+    # def test_invoice_categories(self):
+    #     categories = self.harvest.invoice_item_categories()
+    #     invoice_item_category = self.harvest.create_invoice_item_category('Tabasco')
+    #     invoice_item_category = self.harvest.get_invoice_item_category(invoice_item_category.id)
+    #     self.harvest.update_invoice_item_category(invoice_item_category.id, 'Pass through')
+    #     self.harvest.delete_invoice_item_category(invoice_item_category.id)
+    #
     # def test_invoice_payments(self):
     #     invoice_config = {"subject": "ABC Project Quote", "due_date":"2017-07-27", "line_items":[{"kind":"Service","description":"ABC Project","unit_price":5000.0}]}
     #     invoice = self.harvest.create_invoice(self.sample_client_a, **invoice_config)
@@ -71,7 +112,7 @@ class TestHarvest(unittest.TestCase):
     #     self.harvest.delete_invoice_payment(invoice.id, payment.id)
     #     payments = self.harvest.invoice_payments(invoice.id)
     #     self.harvest.delete_invoice(invoice.id)
-
+    #
     # def test_invoice_messages(self):
     #
     #     invoice_config = {"subject": "ABC Project Quote", "due_date":"2017-07-27", "line_items":[{"kind":"Service","description":"ABC Project","unit_price":5000.0}]}

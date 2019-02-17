@@ -142,7 +142,30 @@ class Creator:
 
 @dataclass
 class Estimate:
+    purchase_order: Optional[str]
+    tax: Optional[float]
+    tax_amount: Optional[float]
+    tax2: Optional[float]
+    tax2_amount: Optional[float]
+    discount: Optional[float]
+    discount_amount: Optional[float]
+    sent_at: Optional[str]
+    accepted_at: Optional[str]
+    declined_at: Optional[str]
+    line_items: List[LineItem]
+    notes: Optional[str]
     id: int = None
+    client_key: str = None
+    number: str = None
+    amount: float = None
+    subject: str = None
+    state: str = None
+    issue_date: str = None
+    due_date: str = None
+    created_at: str = None
+    updated_at: str = None
+    currency: str = None
+    creator: Creator = None
 
 @dataclass
 class Invoice:
@@ -285,6 +308,9 @@ class InvoiceItemCategory:
 
 @dataclass
 class EstimateMessage:
+    event_type: Optional[str]
+    subject: Optional[str]
+    body: Optional[str]
     recipients: List[Recipient]
     id: int = None
     sent_by: str = None
@@ -294,36 +320,6 @@ class EstimateMessage:
     send_me_a_copy: bool = None
     created_at: str = None
     updated_at: str = None
-    event_type: str = None
-    subject: str = None
-    body: str = None
-
-@dataclass
-class Estimate:
-    purchase_order: Optional[str]
-    tax: Optional[float]
-    tax_amount: Optional[float]
-    tax2: Optional[float]
-    tax2_amount: Optional[float]
-    discount: Optional[float]
-    discount_amount: Optional[float]
-    sent_at: Optional[str]
-    accepted_at: Optional[str]
-    declined_at: Optional[str]
-    line_items: List[LineItem]
-    id: int = None
-    client_key: str = None
-    number: str = None
-    amount: float = None
-    subject: str = None
-    notes: str = None
-    state: str = None
-    issue_date: str = None
-    due_date: str = None
-    created_at: str = None
-    updated_at: str = None
-    currency: str = None
-    creator: Creator = None
 
 @dataclass
 class EstimateItemCategory:
