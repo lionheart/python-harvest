@@ -56,47 +56,73 @@ class TestHarvest(unittest.TestCase):
     def test_project(self):
         pass
 
-    def test_timesheets(self):
+    def test_project_task_assignments(self):
+        task_assignments = self.harvest.task_assignments()
+
         project = self.harvest.create_project(self.sample_client_a, "Your New Project", True, "Project", "project")
+        projects = self.harvest.project_task_assignments(project.id)
         new_task = self.harvest.create_task('Integrate With Harvest')
+        
         project_task_assignment = self.harvest.create_task_assignment(project.id, new_task.id, hourly_rate=150.00)
-
-        time_entries = self.harvest.time_entries()
-
-        new_time_entry = self.harvest.create_time_entry_via_duration(project.id, new_task.id, '2019-02-01', hours=7.5)
-        updated_time_entry = self.harvest.update_time_entry(new_time_entry.id, hours=8.0)
-        time_entry = self.harvest.get_time_entry(updated_time_entry.id)
-
-        # external reference currently un-tested
-        # updated_time_entry = self.harvest.update_time_entry(time_entry.id, external_reference={'id': '', 'group_id': '', 'permalink': ''})
-        # updated_time_entry = self.harvest.delete_time_entry_external_reference(time_entry.id)
-
-        self.harvest.delete_time_entry(time_entry.id)
-
-        running_time_entry = self.harvest.create_time_entry(project.id, new_task.id, '2019-02-01')
-        running_time_entry = self.harvest.stop_a_running_time_entry(running_time_entry.id)
-        running_time_entry = self.harvest.restart_a_stopped_time_entry(running_time_entry.id)
-        running_time_entry = self.harvest.stop_a_running_time_entry(running_time_entry.id)
-        self.harvest.delete_time_entry(running_time_entry.id)
+        task_assignment = self.harvest.get_task_assignment(project.id, project_task_assignment.id)
+        updated_task_assignment = self.harvest.update_task_assignment(project.id, project_task_assignment.id, hourly_rate=100.00)
 
         self.harvest.delete_task_assignment(project.id, new_task.id)
-        self.harvest.delete_project(project.id)
         self.harvest.delete_task(new_task.id)
+        self.harvest.delete_project(project.id)
 
+    # def test_projects(self):
+    #     projects = self.harvest.projects()
+    #
+    #     project = self.harvest.create_project(self.sample_client_a, "Your New Project", True, "Project", "project")
+    #     self.harvest.update_project(project.id, budget_by='none')
+    #     updated_project = self.harvest.get_project(project.id)
+    #     print(project)
+    #     print(updated_project)
+    #
+    #     self.harvest.delete_project(project.id)
+
+    # def test_timesheets(self):
+    #     project = self.harvest.create_project(self.sample_client_a, "Your New Project", True, "Project", "project")
+    #     new_task = self.harvest.create_task('Integrate With Harvest')
+    #     project_task_assignment = self.harvest.create_task_assignment(project.id, new_task.id, hourly_rate=150.00)
+    #
+    #     time_entries = self.harvest.time_entries()
+    #
+    #     new_time_entry = self.harvest.create_time_entry_via_duration(project.id, new_task.id, '2019-02-01', hours=7.5)
+    #     updated_time_entry = self.harvest.update_time_entry(new_time_entry.id, hours=8.0)
+    #     time_entry = self.harvest.get_time_entry(updated_time_entry.id)
+    #
+    #     # external reference currently un-tested
+    #     # updated_time_entry = self.harvest.update_time_entry(time_entry.id, external_reference={'id': '', 'group_id': '', 'permalink': ''})
+    #     # updated_time_entry = self.harvest.delete_time_entry_external_reference(time_entry.id)
+    #
+    #     self.harvest.delete_time_entry(time_entry.id)
+    #
+    #     running_time_entry = self.harvest.create_time_entry(project.id, new_task.id, '2019-02-01')
+    #     running_time_entry = self.harvest.stop_a_running_time_entry(running_time_entry.id)
+    #     running_time_entry = self.harvest.restart_a_stopped_time_entry(running_time_entry.id)
+    #     running_time_entry = self.harvest.stop_a_running_time_entry(running_time_entry.id)
+    #     self.harvest.delete_time_entry(running_time_entry.id)
+    #
+    #     self.harvest.delete_task_assignment(project.id, new_task.id)
+    #     self.harvest.delete_project(project.id)
+    #     self.harvest.delete_task(new_task.id)
+    #
     # def test_tasks(self):
     #     tasks = self.harvest.tasks()
     #     new_task = self.harvest.create_task('Integrate With Harvest')
     #     task = self.harvest.get_task(new_task.id)
     #     updated_task = self.harvest.update_task(task.id, default_hourly_rate=100.00)
     #     self.harvest.delete_task(updated_task.id)
-
+    #
     # def test_expense_categories(self):
     #     expense_categories = self.harvest.expense_categories()
     #     expense_category = self.harvest.create_expense_category('Pass Through 00', unit_name='kilograms', unit_price=10.00)
     #     updated_expense_category = self.harvest.update_expense_category(expense_category.id, unit_price=100.00)
     #     expense_category = self.harvest.get_expense_category(updated_expense_category.id)
     #     self.harvest.delete_expense_category(expense_category.id)
-
+    #
     # def test_expenses(self):
     #     project = self.harvest.create_project(self.sample_client_a, "Your New Project", True, "Project", "project")
     #     expense_category = self.harvest.create_expense_category('Pass Through 00', unit_name='kilograms', unit_price=10.00)
@@ -113,14 +139,14 @@ class TestHarvest(unittest.TestCase):
     #
     #     self.harvest.delete_project(project.id)
     #     self.harvest.delete_expense_category(expense_category.id)
-
+    #
     # def test_estimate_item_category(self):
     #     estimate_item_categories = self.harvest.estimate_item_categories()
     #
     #     category = self.harvest.create_estimate_item_category('Tabasco')
     #     self.harvest.update_estimate_item_category(category.id, 'Pass through')
     #     self.harvest.delete_estimate_item_category(category.id)
-
+    #
     # def test_estimates_messages(self):
     #     estimate_parameters = {"subject":"ABC Project Quote","line_items":[{"kind":"Service","description":"ABC Project Quote","unit_price":5000.0}]}
     #     estimate = self.harvest.create_estimate(self.sample_client_a, **estimate_parameters)
