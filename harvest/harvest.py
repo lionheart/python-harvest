@@ -482,7 +482,13 @@ class Harvest(object):
     def create_expense(self, project_id, expense_category_id, spent_date, **kwargs):
         url = '/expenses'
         kwargs.update({'project_id': project_id, 'expense_category_id': expense_category_id, 'spent_date': spent_date})
-        return from_dict(data_class=Expense, data=self._post(url, data=kwargs))
+
+        response = self._post(url, data=kwargs)
+
+        if 'message' in response.keys():
+            return from_dict(data_class=ErrorMessage, data=response)
+
+        return from_dict(data_class=Expense, data=response)
 
     def update_expense(self, expense_id, **kwargs):
         url = '/expenses/{0}'.format(expense_id)

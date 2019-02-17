@@ -78,9 +78,9 @@ class UserAssignment:
 
 @dataclass
 class Project:
+    code: Optional[str]
     id: int = None
     name: str = None
-    code: str = None
 
 @dataclass
 class Expense:
@@ -88,8 +88,9 @@ class Expense:
     user: Optional[User]
     receipt: Optional[Receipt]
     invoice: Optional[InvoiceRef]
+    project: Optional[Project]
+    notes: Optional[str]
     id: int = None
-    notes: str = None
     total_cost: float = None
     units: float = None
     is_closed: bool = False
@@ -100,7 +101,6 @@ class Expense:
     updated_at: str = None
     billable: bool = True
     user_assignment: UserAssignment = None
-    project: Project = None
     expense_category: ExpenseCategory = None
     client: Client = None
 
@@ -412,9 +412,9 @@ class Project:
     fee: Optional[float]
     budget: Optional[float]
     notes: Optional[str]
+    code: Optional[str]
     id: int = None
     name: str = None
-    code: str = None
     is_active: bool = None
     bill_by: str = None
     budget_by: str = None

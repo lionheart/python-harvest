@@ -53,6 +53,33 @@ class TestHarvest(unittest.TestCase):
     def test_status_not_down(self):
         self.assertEqual("none", self.harvest.status['indicator'], "Harvest API is having problems")
 
+    def test_project(self):
+        pass
+
+    # def test_expense_categories(self):
+    #     expense_categories = self.harvest.expense_categories()
+    #     expense_category = self.harvest.create_expense_category('Pass Through 00', unit_name='kilograms', unit_price=10.00)
+    #     updated_expense_category = self.harvest.update_expense_category(expense_category.id, unit_price=100.00)
+    #     expense_category = self.harvest.get_expense_category(updated_expense_category.id)
+    #     self.harvest.delete_expense_category(expense_category.id)
+
+    # def test_expenses(self):
+    #     project = self.harvest.create_project(self.sample_client_a, "Your New Project", True, "Project", "project")
+    #     expense_category = self.harvest.create_expense_category('Pass Through 00', unit_name='kilograms', unit_price=10.00)
+    #
+    #     expenses = self.harvest.expenses()
+    #
+    #     new_expense = self.harvest.create_expense(project.id, expense_category.id, '2019-01-01')
+    #
+    #     expense = self.harvest.get_expense(new_expense.id)
+    #
+    #     updated_expense = self.harvest.update_expense(new_expense.id, notes="This is a note on an expense.")
+    #
+    #     self.harvest.delete_expense(updated_expense.id)
+    #
+    #     self.harvest.delete_project(project.id)
+    #     self.harvest.delete_expense_category(expense_category.id)
+
     # def test_estimate_item_category(self):
     #     estimate_item_categories = self.harvest.estimate_item_categories()
     #
