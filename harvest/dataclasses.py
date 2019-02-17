@@ -66,6 +66,18 @@ class Client:
     created_at: str = None
     updated_at: str = None
 
+# @dataclass
+# class UserAssignment:
+#     budget: Optional[float]
+#     hourly_rate: Optional[float]
+#     id: int = None
+#     is_project_manager: bool = None
+#     is_active: bool = None
+#     created_at: str = None
+#     updated_at: str = None
+#     project: Project = None
+#     user: User = None
+
 @dataclass
 class UserAssignment:
     budget: Optional[float]
@@ -390,17 +402,7 @@ class TimeEntry:
     budgeted: bool = None
     cost_rate: float = None
 
-@dataclass
-class UserAssignment:
-    budget: Optional[float]
-    hourly_rate: Optional[float]
-    id: int = None
-    is_project_manager: bool = None
-    is_active: bool = None
-    created_at: str = None
-    updated_at: str = None
-    project: Project = None
-    user: User = None
+
 
 @dataclass
 class Project:
@@ -460,12 +462,12 @@ class ProjectTaskAssignments:
 @dataclass
 class ProjectAssignment:
     budget: Optional[float]
+    hourly_rate: Optional[float]
     id: int = None
     is_project_manager: bool = None
     is_active: bool = None
     created_at: str = None
     updated_at: str = None
-    hourly_rate: float = None
     project: Project = None
     client: ClientRef = None
     task_assignment: List[ProjectTaskAssignments] = None

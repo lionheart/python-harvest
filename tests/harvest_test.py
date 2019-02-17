@@ -56,15 +56,23 @@ class TestHarvest(unittest.TestCase):
     def test_project(self):
         pass
 
-    def test_cost_rates(self):
+    def test_user_project_assignments(self):
         user = self.harvest.create_user('George', 'Frank', 'george@example.com')
 
-        user_cost_rate = self.harvest.create_user_cost_rate(user.id, 10.00)
-        user_cost_rate = self.harvest.get_user_cost_rate(user.id, user_cost_rate.id)
+        user_project_assignments = self.harvest.project_assignments(user.id)
+        my_project_assignments = self.harvest.my_project_assignments()
 
-        cost_rates = self.harvest.user_cost_rates(user.id)
+        self.harvest.delete_user(user.id)
 
-        # self.harvest.delete_user(user.id)
+    # def test_cost_rates(self):
+    #     user = self.harvest.create_user('George', 'Frank', 'george@example.com')
+    #
+    #     user_cost_rate = self.harvest.create_user_cost_rate(user.id, 10.00)
+    #     user_cost_rate = self.harvest.get_user_cost_rate(user.id, user_cost_rate.id)
+    #
+    #     cost_rates = self.harvest.user_cost_rates(user.id)
+    #
+    #     self.harvest.delete_user(user.id)
 
     # def test_users(self):
     #     users = self.harvest.users()
