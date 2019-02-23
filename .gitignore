@@ -12,3 +12,4 @@ local/
 dist/
 *.bak
 .eggs/
+.tests/test_config.ini
