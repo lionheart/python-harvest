@@ -16,6 +16,9 @@ import json
 import requests
 from requests_oauthlib import OAuth2Session
 from dataclasses import asdict
+from collections import deque
+from datetime import timedelta, datetime
+import time
 
 from dacite import from_dict
 
@@ -36,6 +39,10 @@ class HarvestError(Exception):
 
 
 class Harvest(object):
+
+    # 15 is from the Harvest API doco https://help.getharvest.com/api-v2/introduction/overview/general/
+    RATE_LIMIT_DURATION_SECONDS = 15
+
     def __init__(self, uri, email=None, password=None, refresh_token=None, client_id=None, token=None,
                  put_auth_in_header=True, personal_token=None, account_id=None):
         self.__uri = uri.rstrip('/')
@@ -76,6 +83,10 @@ class Harvest(object):
             if put_auth_in_header:
                 self.__headers['Authorization'] = 'Bearer {0}'.format("{self.personal_token}".format(self=self))
                 self.__headers['Harvest-Account-Id'] = "{self.account_id}".format(self=self)
+
+        self.request_throttle = deque()
+        self.time_limit = timedelta(seconds=self.RATE_LIMIT_DURATION_SECONDS)
+
     @property
     def uri(self):
         return self.__uri
@@ -264,6 +275,12 @@ class Harvest(object):
 
     def get_invoice(self, invoice_id):
         return from_dict(data_class=Invoice, data=self._get('/invoices/{0}'.format(invoice_id)))
+
+    def get_invoices(self, invoice_ids):
+        returnable = []
+        for invoice_id in invoice_ids:
+            returnable.append(self.get_invoice(invoice_id))
+        return returnable
 
     def create_invoice(self, client_id, **kwargs):
         url = '/invoices'
@@ -849,6 +866,18 @@ class Harvest(object):
                 kwargs['account_id'] = self.account_id
         elif self.auth == 'OAuth2':
             requestor = OAuth2Session(client_id=self.client_id, token=self.token)
+
+        now = datetime.now()
+        self.request_throttle.append(now)
+        oldest_time = self.request_throttle.popleft()
+        aged_delta = now - oldest_time
+
+        if aged_delta <= self.time_limit:
+            self.request_throttle.appendleft(oldest_time)
+
+            # 15 is from the Harvest API doco https://help.getharvest.com/api-v2/introduction/overview/general/
+            if (len(self.request_throttle) > 100):
+                time.sleep(self.RATE_LIMIT_DURATION_SECONDS * (aged_delta / self.time_limit))
 
         try:
             resp = requestor.request(**kwargs)
