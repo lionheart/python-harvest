@@ -177,18 +177,20 @@ class TestHarvest(unittest.TestCase):
     #
     # def test_expenses(self):
     #     project = self.harvest.create_project(self.sample_client_a, "Your New Project", True, "Project", "project")
-    #     expense_category = self.harvest.create_expense_category('Pass Through 01', unit_name='kilograms', unit_price=10.00)
+    #     expense_category = self.harvest.create_expense_category('Pass Through 00', unit_name='kilograms', unit_price=10.00)
+    #
     #     expenses = self.harvest.expenses()
+    #
     #     new_expense = self.harvest.create_expense(project.id, expense_category.id, '2019-01-01')
     #     expense = self.harvest.get_expense(new_expense.id)
     #     updated_expense = self.harvest.update_expense(new_expense.id, notes="This is a note on an expense.")
     #     self.harvest.delete_expense(updated_expense.id)
     #
-    #     myreceipt = {'file_name':'Beardybeard.png', 'content_type': 'image/png', 'files': {'receipt': ('Beardybeard.png', open('Beardybeard.png', 'rb'), 'image/png', {'Expires': '0'})}}
+    #     my_first_receipt = {'file_name':'repo-banner.png', 'content_type': 'image/png', 'files': {'receipt': ('repo-banner.png', open('repo-banner.png', 'rb'), 'image/png', {'Expires': '0'})}}
+    #     new_expense = self.harvest.create_expense(project.id, expense_category.id, '2019-01-02', receipt=my_first_receipt)
+    #     my_second_receipt = {'file_name':'repo-banner-bottom.png', 'content_type': 'image/png', 'files': {'receipt': ('repo-banner-bottom.png', open('repo-banner-bottom.png', 'rb'), 'image/png', {'Expires': '0'})}}
+    #     updated_expense = self.harvest.update_expense(new_expense.id, notes="This is a note on an expense.", receipt=my_second_receipt)
     #
-    #     print("project.id, expense_category.id", project.id, expense_category.id)
-    #
-    #     new_expense = self.harvest.create_expense(project.id, expense_category.id, '2019-01-02', receipt=myreceipt)
     #     self.harvest.delete_expense(updated_expense.id)
     #
     #     self.harvest.delete_project(project.id)

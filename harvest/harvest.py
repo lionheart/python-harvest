@@ -505,6 +505,7 @@ class Harvest(object):
             response = self._post(url, data=kwargs, files=receipt['files'])
         else:
             response = self._post(url, data=kwargs)
+
             if 'message' in response.keys():
                 return from_dict(data_class=ErrorMessage, data=response)
 
@@ -512,7 +513,14 @@ class Harvest(object):
 
     def update_expense(self, expense_id, **kwargs):
         url = '/expenses/{0}'.format(expense_id)
-        return from_dict(data_class=Expense, data=self._patch(url, data=kwargs))
+
+        if 'receipt' in kwargs.keys():
+            receipt = kwargs.pop('receipt')
+            response = self._patch(url, data=kwargs, files=receipt['files'])
+        else:
+            response = self._patch(url, data=kwargs)
+
+        return from_dict(data_class=Expense, data=response)
 
     def delete_expense(self, expense_id):
         return self._delete('/expenses/{0}'.format(expense_id))
@@ -841,14 +849,11 @@ class Harvest(object):
     def _post(self, path='/', data=None, files=None):
         return self._request('POST', path, data, files)
 
-    def _put(self, path='/', data=None):
-        return self._request('PUT', path, data)
-
     def _delete(self, path='/', data=None):
         return self._request('DELETE', path, data)
 
-    def _patch(self, path='/', data=None):
-        return self._request('PATCH', path, data)
+    def _patch(self, path='/', data=None, files=None):
+        return self._request('PATCH', path, data, files)
 
     def _request(self, method='GET', path='/', data=None, files=None):
         url = '{self.uri}{path}'.format(self=self, path=path)
@@ -861,7 +866,8 @@ class Harvest(object):
         if files is not None:
             kwargs['data'] = data
             kwargs['files'] = files
-            del(kwargs['headers']['Content-Type'])
+            if 'Content-Type' in kwargs['headers'].keys():
+                del(kwargs['headers']['Content-Type'])
         else:
             kwargs['data'] = json.dumps(data)
 
