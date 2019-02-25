@@ -177,16 +177,18 @@ class TestHarvest(unittest.TestCase):
     #
     # def test_expenses(self):
     #     project = self.harvest.create_project(self.sample_client_a, "Your New Project", True, "Project", "project")
-    #     expense_category = self.harvest.create_expense_category('Pass Through 00', unit_name='kilograms', unit_price=10.00)
-    #
+    #     expense_category = self.harvest.create_expense_category('Pass Through 01', unit_name='kilograms', unit_price=10.00)
     #     expenses = self.harvest.expenses()
-    #
     #     new_expense = self.harvest.create_expense(project.id, expense_category.id, '2019-01-01')
-    #
     #     expense = self.harvest.get_expense(new_expense.id)
-    #
     #     updated_expense = self.harvest.update_expense(new_expense.id, notes="This is a note on an expense.")
+    #     self.harvest.delete_expense(updated_expense.id)
     #
+    #     myreceipt = {'file_name':'Beardybeard.png', 'content_type': 'image/png', 'files': {'receipt': ('Beardybeard.png', open('Beardybeard.png', 'rb'), 'image/png', {'Expires': '0'})}}
+    #
+    #     print("project.id, expense_category.id", project.id, expense_category.id)
+    #
+    #     new_expense = self.harvest.create_expense(project.id, expense_category.id, '2019-01-02', receipt=myreceipt)
     #     self.harvest.delete_expense(updated_expense.id)
     #
     #     self.harvest.delete_project(project.id)
@@ -272,35 +274,35 @@ class TestHarvest(unittest.TestCase):
     #
     #     self.harvest.delete_invoice(invoice.id)
     #
-    def test_invoices(self):
-        original_invoices = self.harvest.invoices()
-        original_invoice_count = original_invoices.total_entries
-
-        invoice = {"subject": "ABC Project Quote", "due_date":"2017-07-27", "line_items":[{"kind":"Service","description":"ABC Project","unit_price":5000.0}]}
-        new_invoice = self.harvest.create_invoice(self.sample_client_a, **invoice)
-
-        invoices = self.harvest.invoices()
-        invoice_count = invoices.total_entries
-
-
-        line_items = [{"kind":"Service","description":"CBA Project","unit_price":10000.0}, {"kind":"Product","description":"CBA Project","unit_price":10000.0}]
-
-        self.harvest.update_invoice(new_invoice.id, subject = "CBA Project Quote")
-        updated_invoice = self.harvest.update_invoice(new_invoice.id, line_items = line_items)
-
-        for item in updated_invoice.line_items:
-            updated_item = {'id':item.id, 'unit_price': 1.0}
-            self.harvest.update_invoice_line_item(updated_invoice.id, updated_item)
-
-        self.harvest.create_invoice_line_item(new_invoice.id, line_items)
-
-        error = self.harvest.create_invoice_line_item(new_invoice.id, "")
-
-        invoice_record = self.harvest.get_invoice(new_invoice.id)
-
-        self.harvest.delete_invoice_line_items(invoice_record.id, invoice_record.line_items)
-
-        # self.harvest.delete_invoice(invoice_record.id)
+    # def test_invoices(self):
+    #     original_invoices = self.harvest.invoices()
+    #     original_invoice_count = original_invoices.total_entries
+    #
+    #     invoice = {"subject": "ABC Project Quote", "due_date":"2017-07-27", "line_items":[{"kind":"Service","description":"ABC Project","unit_price":5000.0}]}
+    #     new_invoice = self.harvest.create_invoice(self.sample_client_a, **invoice)
+    #
+    #     invoices = self.harvest.invoices()
+    #     invoice_count = invoices.total_entries
+    #
+    #
+    #     line_items = [{"kind":"Service","description":"CBA Project","unit_price":10000.0}, {"kind":"Product","description":"CBA Project","unit_price":10000.0}]
+    #
+    #     self.harvest.update_invoice(new_invoice.id, subject = "CBA Project Quote")
+    #     updated_invoice = self.harvest.update_invoice(new_invoice.id, line_items = line_items)
+    #
+    #     for item in updated_invoice.line_items:
+    #         updated_item = {'id':item.id, 'unit_price': 1.0}
+    #         self.harvest.update_invoice_line_item(updated_invoice.id, updated_item)
+    #
+    #     self.harvest.create_invoice_line_item(new_invoice.id, line_items)
+    #
+    #     error = self.harvest.create_invoice_line_item(new_invoice.id, "")
+    #
+    #     invoice_record = self.harvest.get_invoice(new_invoice.id)
+    #
+    #     self.harvest.delete_invoice_line_items(invoice_record.id, invoice_record.line_items)
+    #
+    #     # self.harvest.delete_invoice(invoice_record.id)
     #
     # def test_client(self):
     #     original_clients = self.harvest.clients()

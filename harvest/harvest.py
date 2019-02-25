@@ -500,10 +500,13 @@ class Harvest(object):
         url = '/expenses'
         kwargs.update({'project_id': project_id, 'expense_category_id': expense_category_id, 'spent_date': spent_date})
 
-        response = self._post(url, data=kwargs)
-
-        if 'message' in response.keys():
-            return from_dict(data_class=ErrorMessage, data=response)
+        if 'receipt' in kwargs.keys():
+            receipt = kwargs.pop('receipt')
+            response = self._post(url, data=kwargs, files=receipt['files'])
+        else:
+            response = self._post(url, data=kwargs)
+            if 'message' in response.keys():
+                return from_dict(data_class=ErrorMessage, data=response)
 
         return from_dict(data_class=Expense, data=response)
 
@@ -835,8 +838,8 @@ class Harvest(object):
     def _get(self, path='/', data=None):
         return self._request('GET', path, data)
 
-    def _post(self, path='/', data=None):
-        return self._request('POST', path, data)
+    def _post(self, path='/', data=None, files=None):
+        return self._request('POST', path, data, files)
 
     def _put(self, path='/', data=None):
         return self._request('PUT', path, data)
@@ -847,14 +850,21 @@ class Harvest(object):
     def _patch(self, path='/', data=None):
         return self._request('PATCH', path, data)
 
-    def _request(self, method='GET', path='/', data=None):
+    def _request(self, method='GET', path='/', data=None, files=None):
         url = '{self.uri}{path}'.format(self=self, path=path)
         kwargs = {
             'method'  : method,
             'url'     : '{self.uri}{path}'.format(self=self, path=path),
             'headers' : self.__headers,
-            'data'   : json.dumps(data),
         }
+
+        if files is not None:
+            kwargs['data'] = data
+            kwargs['files'] = files
+            del(kwargs['headers']['Content-Type'])
+        else:
+            kwargs['data'] = json.dumps(data)
+
         if self.auth == 'Basic':
             requestor = requests
             if 'Authorization' not in self.__headers:
