@@ -19,6 +19,7 @@ from dataclasses import asdict
 from collections import deque
 from datetime import timedelta, datetime
 import time
+import copy
 
 from dacite import from_dict
 
@@ -860,14 +861,13 @@ class Harvest(object):
         kwargs = {
             'method'  : method,
             'url'     : '{self.uri}{path}'.format(self=self, path=path),
-            'headers' : self.__headers,
+            'headers' : copy.deepcopy(self.__headers),
         }
 
         if files is not None:
             kwargs['data'] = data
             kwargs['files'] = files
-            if 'Content-Type' in kwargs['headers'].keys():
-                del(kwargs['headers']['Content-Type'])
+            del(kwargs['headers']['Content-Type'])
         else:
             kwargs['data'] = json.dumps(data)
 
