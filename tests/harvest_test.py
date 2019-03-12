@@ -14,13 +14,17 @@
 
 import os, sys
 import unittest
-from time import time
 import configparser
 from dataclasses import asdict
+from requests_oauthlib import OAuth2Session
+from oauthlib.oauth2 import MobileApplicationClient, WebApplicationClient
+
+from dacite import from_dict
 
 sys.path.insert(0, sys.path[0]+"/..")
 
 import harvest
+from harvest.dataclasses import *
 
 """
 There is a sample test config.
@@ -32,10 +36,23 @@ tests/test_config.ini is already in .gitignore
 Just in case, the test config file looks like this:
 
 [PERSONAL ACCESS TOKEN]
-url = 'https://api.harvestapp.com/api/v2'
+url = https://api.harvestapp.com/api/v2
 put_auth_in_header = True
-personal_token = 'Bearer 1234567.pt.somebunchoflettersandnumbers'
-account_id = '1234567'
+personal_token = Bearer 1234567.pt.somebunchoflettersandnumbers
+account_id = 1234567
+
+[OAuth2 Implicit Code Grant]
+uri = https://api.harvestapp.com/api/v2
+client_id = aclientid
+auth_url = https://id.getharvest.com/oauth2/authorize
+
+[OAuth2 Authorization Code Grant]
+uri = https://api.harvestapp.com/api/v2
+client_id = aclientid
+client_secret = itsmysecret
+auth_url = https://id.getharvest.com/oauth2/authorize
+token_url = https://id.getharvest.com/api/v2/oauth2/token
+account_id = 1234567
 """
 
 class TestHarvest(unittest.TestCase):
@@ -45,13 +62,70 @@ class TestHarvest(unittest.TestCase):
     def setUp(self):
         config = configparser.ConfigParser()
         config.read('test_config.ini')
-        self.harvest = harvest.Harvest(config['PERSONAL ACCESS TOKEN']['uri'], put_auth_in_header=config['PERSONAL ACCESS TOKEN']['put_auth_in_header'], personal_token=config['PERSONAL ACCESS TOKEN']['personal_token'], account_id=config['PERSONAL ACCESS TOKEN']['account_id'])
+        #--- PERSONAL ACCESS TOKEN ---
+        personal_access_token = PersonalAccessToken(config['PERSONAL ACCESS TOKEN']['account_id'], config['PERSONAL ACCESS TOKEN']['personal_token'])
+        self.harvest = harvest.Harvest(config['PERSONAL ACCESS TOKEN']['uri'], personal_access_token)
+        # oauth2 = OAuth2_ClientSide(config['OAuth2_Implicit_Code_Grant']['client_id'], config['OAuth2_Implicit_Code_Grant']['auth_url'])
 
-    def tearDown(self):
-        pass
+        # # #--- CLIENT SIDE APPLICATIONS ---
+        # client = MobileApplicationClient(client_id=config['OAuth2 Implicit Code Grant']['client_id'])
+        #
+        # url = client.prepare_request_uri(config['OAuth2 Implicit Code Grant']['auth_url'])
+        # print("Browse to here and authenticate: ", url)
+        # response_uri = input("Please put the resulting URL in here:")
+        # # response_uri = "https://127.0.0.1:5000/callback?access_token=1387424.at.ckrsmRcPq2p7bunoRhTjmMx_bgFUslDgy-2jjfodpKXxeuXESktpZBogQBnNtO5lGBdWxnomYOfL7PLvsHQO-Q&expires_in=1209599&scope=harvest%3A1062659&token_type=bearer"
+        # response_uri = response_uri.replace('callback?', 'callback#')
+        # token = client.parse_request_uri_response(response_uri)
+        # oauth2_clientside_token = from_dict(data_class=OAuth2_ClientSide_Token, data=token)
+        #
+        # self.harvest = harvest.Harvest(config['OAuth2 Implicit Code Grant']['uri'], oauth2_clientside_token)
 
-    def test_status_not_down(self):
-        self.assertEqual("none", self.harvest.status['indicator'], "Harvest API is having problems")
+        # # #--- Server SIDE APPLICATIONS ---
+        # client = WebApplicationClient(client_id=config['OAuth2 Authorization Code Grant']['client_id'])
+        # oauth = OAuth2Session(client=client)
+        #
+        # authorization_url, state = oauth.authorization_url(config['OAuth2 Authorization Code Grant']['auth_url'])
+        # print("Browse to here and authenticate: ", authorization_url)
+        # response_uri = input("Please put the resulting URL in here:")
+        #
+        # github = OAuth2Session(config['OAuth2 Authorization Code Grant']['client_id'], state=state, )
+        # token = github.fetch_token(config['OAuth2 Authorization Code Grant']['token_url'], client_secret=config['OAuth2 Authorization Code Grant']['client_secret'], authorization_response=response_uri, state=state)
+        # oauth2_serverside_token = from_dict(data_class=OAuth2_ServerSide_Token, data=token)
+        # oauth2_serverside = OAuth2_ServerSide(client_id= config['OAuth2 Authorization Code Grant']['client_id'], client_secret= config['OAuth2 Authorization Code Grant']['client_secret'], token= oauth2_serverside_token, refresh_url= config['OAuth2 Authorization Code Grant']['token_url'])
+        #
+        # self.harvest = harvest.Harvest(config['OAuth2 Authorization Code Grant']['uri'], oauth2_serverside)
+
+
+    #
+    # def tearDown(self):
+    #     pass
+    #
+    # def test_status_not_down(self):
+    #     self.assertEqual("none", self.harvest.status['indicator'], "Harvest API is having problems")
+
+
+    # def test_OAuth2(self):
+        # harvestapp = OAuth2Service(
+        #     client_id='SGyrhXtLAYy0WKqtAucHKdP_',
+        #     client_secret='JRrw_9u1MpsTxsvuQJh76TW59fjSaLnqJNu3kCXRamHpcbvtUuNXQ7MqHKB3SRaZXnfPDIBkXGaLW2vuIYGn2Q',
+        #     name='harvetapp',
+        #     authorize_url='https://id.getharvest.com/oauth2/authorize',
+        #     access_token_url='https://id.getharvest.com/oauth/authorize',
+        #     base_url='https://id.getharvest.com/')
+        #
+        # # https://localhost/?access_token=1387424.at.03VOq-K2U79kPJMuoU3IgdWYWN4DCqg9yZgw7Qm2WYbQuTVaJlnF6vW5Ftsian6rOBoKXNtLFaQeE29CxKpt2g&expires_in=1209599&scope=harvest%3A1062659&token_type=bearer
+        #
+        # access_token = 'Bearer 1387424.at.03VOq-K2U79kPJMuoU3IgdWYWN4DCqg9yZgw7Qm2WYbQuTVaJlnF6vW5Ftsian6rOBoKXNtLFaQeE29CxKpt2g'
+        #
+        # # return an authenticated session
+        # session = harvestapp.get_session(access_token)
+        # print("session", session)
+        #
+        # # make a request using the authenticated session
+        # user = session.get('me')
+        # print("user", user)
+        #
+        # print('Currently logged in as: {user}'.format(user=user['username']))
 
     # def test_user_project_assignments(self):
     #     user = self.harvest.create_user('George', 'Frank', 'george@example.com')
@@ -350,6 +424,10 @@ class TestHarvest(unittest.TestCase):
     #
     #     self.harvest.delete_client_contact(client_contact.id)
 
+    def test_company(self):
+        company = self.harvest.company()
+
+        print(company)
 
 
 if __name__ == '__main__':

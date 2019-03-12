@@ -19,7 +19,6 @@ from dataclasses import asdict
 from collections import deque
 from datetime import timedelta, datetime
 import time
-import copy
 
 from dacite import from_dict
 
@@ -30,61 +29,34 @@ try:
 except ImportError:
     from urlparse import urlparse
 
-from base64 import b64encode as enc64
-from collections import OrderedDict
-
-HARVEST_STATUS_URL = 'http://www.harveststatus.com/api/v2/status.json'
-
 class HarvestError(Exception):
     pass
-
 
 class Harvest(object):
 
     # 15 is from the Harvest API doco https://help.getharvest.com/api-v2/introduction/overview/general/
     RATE_LIMIT_DURATION_SECONDS = 15
 
-    def __init__(self, uri, email=None, password=None, refresh_token=None, client_id=None, token=None,
-                 put_auth_in_header=True, personal_token=None, account_id=None):
+    def __init__(self, uri, auth):
         self.__uri = uri.rstrip('/')
         parsed = urlparse(uri)
+
+        self.__headers = {'User-Agent': 'Lionheart/python-harvest'}
+
         if not (parsed.scheme and parsed.netloc):
             raise HarvestError('Invalid harvest uri "{0}".'.format(uri))
 
-        if refresh_token:
-            self.__headers = {
-                "Content-Type": 'application/x-www-form-urlencoded',
-                "Accept": 'application/json',
-            }
-        else:
-            self.__headers = {
-                'Content-Type'  : 'application/json',
-                'Accept'        : 'application/json',
-                'User-Agent'    : 'Mozilla/5.0',  # 'TimeTracker for Linux' -- ++ << >>
-            }
-        if email and password:
-            self.__auth     = 'Basic'
-            self.__email    = email.strip()
-            self.__password = password
-            if put_auth_in_header:
-                self.__headers['Authorization'] = 'Basic {0}'.format(enc64("{self.email}:{self.password}".format(self=self).encode("utf8")).decode("utf8"))
-        elif client_id and token:
-            self.__auth         = 'OAuth2'
-            self.__client_id    = client_id
-            self.__token        = token
-        elif account_id and personal_token:
-            self.__auth = 'Bearer'
-            self.__account_id = account_id
+        if isinstance(auth, PersonalAccessToken):
+            self.__headers['Authorization'] = auth.access_token
+            self.__headers['Harvest-Account-ID'] = auth.account_id
 
-            if ('Bearer' in personal_token):
-                self.__personal_token = personal_token[personal_token.index('Bearer ') + len('Bearer'):]
-            else:
-                self.__personal_token = personal_token
+        elif isinstance(auth, OAuth2_ClientSide_Token):
+            self.__headers['Authorization'] = auth.access_token
 
-            if put_auth_in_header:
-                self.__headers['Authorization'] = 'Bearer {0}'.format("{self.personal_token}".format(self=self))
-                self.__headers['Harvest-Account-Id'] = "{self.account_id}".format(self=self)
+        elif isinstance(auth, OAuth2_ServerSide):
+            self.__headers['Authorization'] = auth.token.access_token
 
+        self.__auth = auth
         self.request_throttle = deque()
         self.time_limit = timedelta(seconds=self.RATE_LIMIT_DURATION_SECONDS)
 
@@ -93,36 +65,12 @@ class Harvest(object):
         return self.__uri
 
     @property
+    def headers(self):
+        return self.__headers
+
+    @property
     def auth(self):
         return self.__auth
-
-    @property
-    def email(self):
-        return self.__email
-
-    @property
-    def password(self):
-        return self.__password
-
-    @property
-    def client_id(self):
-        return self.__client_id
-
-    @property
-    def token(self):
-        return self.__token
-
-    @property
-    def personal_token(self):
-        return self.__personal_token
-
-    @property
-    def account_id(self):
-        return self.__account_id
-
-    @property
-    def status(self):
-        return status()
 
     ## Client Contacts
 
@@ -134,7 +82,7 @@ class Harvest(object):
         if updated_since is not None:
             url = '{0}&updated_since={1}'.format(url, updated_since)
 
-        return from_dict(data_class=ClientContacts, data=self._get(url))
+        return ClientContacts.from_json(self._get(url))
 
     def get_client_contact(self, contact_id):
         return from_dict(data_class=ClientContact, data=self._get('/contacts/{0}'.format(contact_id)))
@@ -858,31 +806,22 @@ class Harvest(object):
 
     def _request(self, method='GET', path='/', data=None, files=None):
         url = '{self.uri}{path}'.format(self=self, path=path)
+
         kwargs = {
-            'method'  : method,
-            'url'     : '{self.uri}{path}'.format(self=self, path=path),
-            'headers' : copy.deepcopy(self.__headers),
+            'method': method,
+            'url': '{self.uri}{path}'.format(self=self, path=path),
+            'headers': self.__headers
         }
 
         if files is not None:
-            kwargs['data'] = data
             kwargs['files'] = files
-            del(kwargs['headers']['Content-Type'])
-        else:
+
+        if data is not None:
             kwargs['data'] = json.dumps(data)
 
-        if self.auth == 'Basic':
-            requestor = requests
-            if 'Authorization' not in self.__headers:
-                kwargs['auth'] = (self.email, self.password)
-        elif self.auth == 'Bearer':
-            requestor = requests
-            if 'Authorization' not in self.__headers:
-                kwargs['access_token'] = self.personal_token
-                kwargs['account_id'] = self.account_id
-        elif self.auth == 'OAuth2':
-            requestor = OAuth2Session(client_id=self.client_id, token=self.token)
+        requestor = requests
 
+        # request throttling
         now = datetime.now()
         self.request_throttle.append(now)
         oldest_time = self.request_throttle.popleft()
@@ -895,23 +834,22 @@ class Harvest(object):
             if (len(self.request_throttle) > 100):
                 time.sleep(self.RATE_LIMIT_DURATION_SECONDS * (aged_delta / self.time_limit))
 
+        # "auto" refresh_token. Currently only works on Authorization Code flow
+        if isinstance(self.__auth, OAuth2_ServerSide) and (datetime.utcfromtimestamp(self.__auth.token.expires_at) <= datetime.now()):
+            new_session = OAuth2Session(client_id=self.__auth.client_id, token=asdict(self.__auth.token))
+            oauth_token = new_session.refresh_token(self.__auth.refresh_url, client_id=self.__auth.client_id, client_secret=self.__auth.client_secret)
+            self.__auth = from_dict(data_class=OAuth2_ServerSide_Token, data=oauth_token)
+
         try:
             resp = requestor.request(**kwargs)
             if 'DELETE' not in method:
                 try:
-                    return resp.json(object_pairs_hook=OrderedDict)
+                    return resp.json()
                 except:
                     return resp
             return resp
         except Exception as e:
             raise HarvestError(e)
-
-def status():
-    try:
-        status = requests.get(HARVEST_STATUS_URL).json().get('status', {})
-    except:
-        status = {}
-    return status
 
 def remove_nones(obj):
   if isinstance(obj, (list, tuple, set)):

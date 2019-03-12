@@ -1,10 +1,97 @@
 from dataclasses import dataclass, field
 from typing import Optional, List
 
+from dataclasses_json import dataclass_json
+
+@dataclass
+class Auth:
+    auth_type: str
+
+@dataclass
+class PersonalAccessToken(Auth):
+    account_id: str
+    access_token: str
+    put_auth_in_header: bool
+
+    def __init__(self, account_id, access_token, put_auth_in_header= True):
+        super().__init__('Personal Access Token')
+        self.account_id = account_id
+        if access_token.find('Bearer') > -1:
+            self.access_token = access_token
+        else:
+            self.access_token = 'Bearer ' + access_token
+
+        self.put_auth_in_header = put_auth_in_header
+
+@dataclass
+class OAuth2_ServerSide_Token():
+    access_token: str
+    refresh_token: str
+    expires_in: int
+    expires_at: float
+
+    def __init__(self, access_token, refresh_token, expires_in, expires_at, refresh_url=None):
+        if access_token.find('Bearer') > -1:
+            self.access_token = access_token
+        else:
+            self.access_token = 'Bearer ' + access_token
+
+        self.refresh_token = refresh_token
+        self.expires_in = expires_in
+        self.expires_at = expires_at
+        self.refresh_url = refresh_url
+
+@dataclass
+class OAuth2_ServerSide(Auth):
+    """Implicit Code Grant Flow for OAuth2"""
+    client_id: str
+    client_secret: str
+    token: OAuth2_ServerSide_Token
+    refresh_url: Optional[str]
+
+    def __init__(self, client_id, client_secret, token, refresh_url):
+        super().__init__(auth_type = 'Server Side Applications')
+        self.client_id = client_id
+        self.client_secret = client_secret
+        self.token = token
+        self.refresh_url = refresh_url
+
+@dataclass
+class OAuth2_ClientSide_Token():
+    access_token: str
+    expires_in: int
+    token_type: str
+    scope: List[str]
+
+    def __init__(self, access_token, expires_in, token_type, scope):
+        if access_token.find('Bearer') > -1:
+            self.access_token = access_token
+        else:
+            self.access_token = 'Bearer ' + access_token
+
+        self.expires_in = expires_in
+        self.token_type = token_type
+        self.scope = scope
+
+# @dataclass
+# class OAuth2_ClientSide(Auth):
+#     """Authorizaton Code Grant Flow for OAuth2"""
+#     token: Optional[OAuth2_ClientSide_Token]
+#     client_id: str
+#     auth_url: str
+#     # scopes: List[str]
+#
+#     def __init__(self, client_id, auth_url):
+#         super().__init__('Client Side Applications')
+#         self.client_id = client_id
+#         self.auth_url = auth_url
+
+@dataclass_json
 @dataclass
 class ErrorMessage:
     message: str
 
+@dataclass_json
 @dataclass
 class Company:
     base_uri: str = None
@@ -24,6 +111,7 @@ class Company:
     thousands_separator: str = None
     color_scheme: str = None
 
+@dataclass_json
 @dataclass
 class ExpenseCategory:
     unit_name: Optional[str]
@@ -34,11 +122,13 @@ class ExpenseCategory:
     created_at: str = None
     updated_at: str = None
 
+@dataclass_json
 @dataclass
 class InvoiceRef:
     id: int = None
     number: str = None
 
+@dataclass_json
 @dataclass
 class Receipt:
     url: str = None
@@ -46,16 +136,19 @@ class Receipt:
     file_size: int = None
     content_type: str = None
 
+@dataclass_json
 @dataclass
 class User:
     id: int = None
     name: str = None
 
+@dataclass_json
 @dataclass
 class ClientRef:
     id: int = None
     name: str = None
 
+@dataclass_json
 @dataclass
 class Client:
     address: Optional[str]
@@ -67,7 +160,7 @@ class Client:
     updated_at: str = None
 
 
-
+@dataclass_json
 @dataclass
 class UserAssignment:
     budget: Optional[float]
@@ -78,12 +171,14 @@ class UserAssignment:
     updated_at: str = None
     hourly_rate: float = None
 
+@dataclass_json
 @dataclass
 class Project:
     code: Optional[str]
     id: int = None
     name: str = None
 
+@dataclass_json
 @dataclass
 class Expense:
     locked_reason: Optional[str]
@@ -106,6 +201,7 @@ class Expense:
     expense_category: ExpenseCategory = None
     client: Client = None
 
+@dataclass_json
 @dataclass
 class LineItem:
     project: Optional[Project]
@@ -118,6 +214,7 @@ class LineItem:
     taxed: bool = None
     taxed2: bool = None
 
+@dataclass_json
 @dataclass
 class ExpenseImport:
     summary_type: str
@@ -125,23 +222,27 @@ class ExpenseImport:
     to: str = None
     attach_receipt: str = None
 
+@dataclass_json
 @dataclass
 class TimeImport:
     summary_type: str
     #from: str = None
     to: str = None
 
+@dataclass_json
 @dataclass
 class LineItemImport:
     time: Optional[TimeImport]
     expenses: Optional[ExpenseImport]
     project_ids: List[Project]
 
+@dataclass_json
 @dataclass
 class Creator:
     id: int = None
     name: str = None
 
+@dataclass_json
 @dataclass
 class Estimate:
     purchase_order: Optional[str]
@@ -169,6 +270,7 @@ class Estimate:
     currency: str = None
     creator: Creator = None
 
+@dataclass_json
 @dataclass
 class Invoice:
     purchase_order: Optional[str]
@@ -204,6 +306,7 @@ class Invoice:
     creator: Creator = None
     client: ClientRef = None
 
+@dataclass_json
 @dataclass
 class FreeFormInvoice:
     notes: Optional[str]
@@ -221,7 +324,7 @@ class FreeFormInvoice:
     due_date: str = None
     payment_term: str = None
     line_items: List[LineItem] = None
-
+@dataclass_json
 @dataclass
 class InvoiceImport:
     notes: Optional[str]
@@ -240,6 +343,7 @@ class InvoiceImport:
     due_date: str = None
     payment_term: str = None
 
+@dataclass_json
 @dataclass
 class ClientContact:
     title: Optional[str]
@@ -254,11 +358,13 @@ class ClientContact:
     updated_at: str = None
     client: Client = None
 
+@dataclass_json
 @dataclass
 class Recipient:
     name: str = None
     email: str = None
 
+@dataclass_json
 @dataclass
 class InvoiceMessage:
     send_reminder_on: Optional[bool]
@@ -279,11 +385,13 @@ class InvoiceMessage:
     updated_at: str = None
     attach_pdf: bool = None
 
+@dataclass_json
 @dataclass
 class PaymentGateway:
     id: Optional[int]
     name: Optional[str]
 
+@dataclass_json
 @dataclass
 class InvoicePayment:
     transaction_id: Optional[str]
@@ -298,7 +406,7 @@ class InvoicePayment:
     created_at: str = None
     updated_at: str = None
 
-
+@dataclass_json
 @dataclass
 class InvoiceItemCategory:
     id: int = None
@@ -308,6 +416,7 @@ class InvoiceItemCategory:
     created_at: str = None
     updated_at: str = None
 
+@dataclass_json
 @dataclass
 class EstimateMessage:
     event_type: Optional[str]
@@ -323,6 +432,7 @@ class EstimateMessage:
     created_at: str = None
     updated_at: str = None
 
+@dataclass_json
 @dataclass
 class EstimateItemCategory:
     id: int = None
@@ -330,11 +440,13 @@ class EstimateItemCategory:
     created_at: str = None
     updated_at: str = None
 
+@dataclass_json
 @dataclass
 class TaskRef:
     id: str = None
     name: str = None
 
+@dataclass_json
 @dataclass
 class Task:
     default_hourly_rate: Optional[float]
@@ -346,11 +458,13 @@ class Task:
     created_at: str = None
     updated_at: str = None
 
+@dataclass_json
 @dataclass
 class TaskAssignmentRef:
     id: int = None
     name: str = None
 
+@dataclass_json
 @dataclass
 class TaskAssignment:
     budget: Optional[float]
@@ -363,6 +477,7 @@ class TaskAssignment:
     project: Project = None
     task: TaskAssignmentRef = None
 
+@dataclass_json
 @dataclass
 class UserAssignment:
     budget: Optional[float]
@@ -375,6 +490,7 @@ class UserAssignment:
     project: Project = None
     user: User = None
 
+@dataclass_json
 @dataclass
 class ProjectTaskAssignments:
     hourly_rate: Optional[float]
@@ -386,6 +502,7 @@ class ProjectTaskAssignments:
     updated_at: str = None
     task: TaskRef = None
 
+@dataclass_json
 @dataclass
 class TimeEntry:
     notes: Optional[str]
@@ -416,7 +533,7 @@ class TimeEntry:
     cost_rate: float = None
 
 
-
+@dataclass_json
 @dataclass
 class Project:
     over_budget_notification_date: Optional[str]
@@ -444,6 +561,7 @@ class Project:
     client: Client = None
     cost_budget_include_expenses: bool = None
 
+@dataclass_json
 @dataclass
 class Role:
     id: int = None
@@ -452,6 +570,7 @@ class Role:
     created_at: str = None
     updated_at: str = None
 
+@dataclass_json
 @dataclass
 class CostRate:
     start_date: Optional[str]
@@ -461,6 +580,7 @@ class CostRate:
     created_at: str = None
     updated_at: str = None
 
+@dataclass_json
 @dataclass
 class ProjectAssignment:
     budget: Optional[float]
@@ -474,6 +594,7 @@ class ProjectAssignment:
     client: ClientRef = None
     task_assignment: List[ProjectTaskAssignments] = None
 
+@dataclass_json
 @dataclass
 class User:
     default_hourly_rate: Optional[float]
@@ -498,23 +619,7 @@ class User:
     roles: List[str] = None
     avatar_url: str = None
 
-@dataclass
-class Links:
-    next: Optional[str]
-    previous: Optional[str]
-    first: str
-    last: str
-
-@dataclass
-class BasePage:
-    previous_page: Optional[int]
-    next_page: Optional[int]
-    per_page: int = None
-    total_pages: int = None
-    total_entries: int = None
-    page: int = 1
-    links: Links = None
-
+@dataclass_json
 @dataclass
 class DetailedTimeEntry:
     notes: Optional[str]
@@ -538,86 +643,126 @@ class DetailedTimeEntry:
     cost_amount: float
     currency: str
 
+@dataclass_json
+@dataclass
+class Links:
+    next: Optional[str]
+    previous: Optional[str]
+    first: str
+    last: str
+
+@dataclass_json
+@dataclass
+class BasePage:
+    previous_page: Optional[int]
+    next_page: Optional[int]
+    per_page: int = None
+    total_pages: int = None
+    total_entries: int = None
+    page: int = 1
+    links: Links = None
+
+@dataclass_json
 @dataclass
 class ClientContacts(BasePage):
     contacts: List[ClientContact] = field(init=False)
 
+@dataclass_json
 @dataclass
 class Clients(BasePage):
     clients: List[Client] = field(init=False)
 
+@dataclass_json
 @dataclass
 class InvoiceMessages(BasePage):
     invoice_messages: List[InvoiceMessage] = field(init=False)
 
+@dataclass_json
 @dataclass
 class InvoicePayments(BasePage):
     invoice_payments: List[InvoicePayment] = field(init=False)
 
+@dataclass_json
 @dataclass
 class Invoices(BasePage):
     invoices: List[Invoice] = field(init=False)
 
+@dataclass_json
 @dataclass
 class InvoiceItemCategories(BasePage):
     invoice_item_categories: List[InvoiceItemCategory] = field(init=False)
 
+@dataclass_json
 @dataclass
 class EstimateMessages(BasePage):
     estimate_messages: List[EstimateMessage] = field(init=False)
 
+@dataclass_json
 @dataclass
 class Estimates(BasePage):
     estimates: List[Estimate] = field(init=False)
 
+@dataclass_json
 @dataclass
 class EstimateItemCategories(BasePage):
     estimate_item_categories: List[EstimateItemCategory] = field(init=False)
 
+@dataclass_json
 @dataclass
 class Expenses(BasePage):
     expenses: List[Expense] = field(init=False)
 
+@dataclass_json
 @dataclass
 class ExpenseCategories(BasePage):
     expense_categories: List[ExpenseCategory] = field(init=False)
 
+@dataclass_json
 @dataclass
 class Tasks(BasePage):
     tasks: List[Task] = field(init=False)
 
+@dataclass_json
 @dataclass
 class TimeEntries(BasePage):
     time_entries: List[TimeEntry] = field(init=False)
 
+@dataclass_json
 @dataclass
 class UserAssignments(BasePage):
     user_assignments: List[UserAssignment] = field(init=False)
 
+@dataclass_json
 @dataclass
 class TaskAssignments(BasePage):
     task_assignments: List[TaskAssignment] = field(init=False)
 
+@dataclass_json
 @dataclass
 class Projects(BasePage):
     projects: List[Project] = field(init=False)
 
+@dataclass_json
 @dataclass
 class Roles(BasePage):
     roles: List[Role] = field(init=False)
 
+@dataclass_json
 @dataclass
 class UserCostRates(BasePage):
     cost_rates: List[CostRate] = field(init=False)
 
+@dataclass_json
 @dataclass
 class ProjectAssignments(BasePage):
     project_assignments: List[ProjectAssignment] = field(init=False)
 
+@dataclass_json
 @dataclass
 class Users(BasePage):
     users: List[User] = field(init=False)
 
+@dataclass_json
 @dataclass
 class DetailedTimeReport():
     detailed_time_entries: List[DetailedTimeEntry]
