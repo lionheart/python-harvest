@@ -23,6 +23,7 @@ class PersonalAccessToken(Auth):
 
         self.put_auth_in_header = put_auth_in_header
 
+# Authorization Code Flow
 @dataclass
 class OAuth2_ServerSide_Token():
     access_token: str
@@ -31,7 +32,7 @@ class OAuth2_ServerSide_Token():
     expires_at: float
 
     def __init__(self, access_token, refresh_token, expires_in, expires_at, refresh_url=None):
-        if access_token.find('Bearer') > -1:
+        if access_token.upper().find('BEARER ') > -1:
             self.access_token = access_token
         else:
             self.access_token = 'Bearer ' + access_token
@@ -41,6 +42,7 @@ class OAuth2_ServerSide_Token():
         self.expires_at = expires_at
         self.refresh_url = refresh_url
 
+# Authorization Code Flow
 @dataclass
 class OAuth2_ServerSide(Auth):
     """Implicit Code Grant Flow for OAuth2"""
@@ -56,6 +58,7 @@ class OAuth2_ServerSide(Auth):
         self.token = token
         self.refresh_url = refresh_url
 
+# Implicit Code Flow
 @dataclass
 class OAuth2_ClientSide_Token():
     access_token: str
@@ -64,7 +67,7 @@ class OAuth2_ClientSide_Token():
     scope: List[str]
 
     def __init__(self, access_token, expires_in, token_type, scope):
-        if access_token.find('Bearer') > -1:
+        if access_token.upper().find('BEARER') > -1:
             self.access_token = access_token
         else:
             self.access_token = 'Bearer ' + access_token
@@ -73,6 +76,7 @@ class OAuth2_ClientSide_Token():
         self.token_type = token_type
         self.scope = scope
 
+# # Implicit Code Flow
 # @dataclass
 # class OAuth2_ClientSide(Auth):
 #     """Authorizaton Code Grant Flow for OAuth2"""

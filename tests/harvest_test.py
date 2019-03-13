@@ -67,29 +67,29 @@ class TestHarvest(unittest.TestCase):
         self.harvest = harvest.Harvest(config['PERSONAL ACCESS TOKEN']['uri'], personal_access_token)
         # oauth2 = OAuth2_ClientSide(config['OAuth2_Implicit_Code_Grant']['client_id'], config['OAuth2_Implicit_Code_Grant']['auth_url'])
 
-        # # #--- CLIENT SIDE APPLICATIONS ---
-        # client = MobileApplicationClient(client_id=config['OAuth2 Implicit Code Grant']['client_id'])
+        # #--- CLIENT SIDE APPLICATIONS ---
+        # mobileclient = MobileApplicationClient(client_id=config['OAuth2 Implicit Code Grant']['client_id'])
         #
-        # url = client.prepare_request_uri(config['OAuth2 Implicit Code Grant']['auth_url'])
+        # url = mobileclient.prepare_request_uri(config['OAuth2 Implicit Code Grant']['auth_url'])
         # print("Browse to here and authenticate: ", url)
         # response_uri = input("Please put the resulting URL in here:")
         # # response_uri = "https://127.0.0.1:5000/callback?access_token=1387424.at.ckrsmRcPq2p7bunoRhTjmMx_bgFUslDgy-2jjfodpKXxeuXESktpZBogQBnNtO5lGBdWxnomYOfL7PLvsHQO-Q&expires_in=1209599&scope=harvest%3A1062659&token_type=bearer"
         # response_uri = response_uri.replace('callback?', 'callback#')
-        # token = client.parse_request_uri_response(response_uri)
+        # token = mobileclient.parse_request_uri_response(response_uri)
         # oauth2_clientside_token = from_dict(data_class=OAuth2_ClientSide_Token, data=token)
         #
         # self.harvest = harvest.Harvest(config['OAuth2 Implicit Code Grant']['uri'], oauth2_clientside_token)
 
-        # # #--- Server SIDE APPLICATIONS ---
-        # client = WebApplicationClient(client_id=config['OAuth2 Authorization Code Grant']['client_id'])
-        # oauth = OAuth2Session(client=client)
+        # #--- Server SIDE APPLICATIONS ---
+        # webclient = WebApplicationClient(client_id=config['OAuth2 Authorization Code Grant']['client_id'])
+        # oauth = OAuth2Session(client=webclient)
         #
         # authorization_url, state = oauth.authorization_url(config['OAuth2 Authorization Code Grant']['auth_url'])
         # print("Browse to here and authenticate: ", authorization_url)
         # response_uri = input("Please put the resulting URL in here:")
         #
-        # github = OAuth2Session(config['OAuth2 Authorization Code Grant']['client_id'], state=state, )
-        # token = github.fetch_token(config['OAuth2 Authorization Code Grant']['token_url'], client_secret=config['OAuth2 Authorization Code Grant']['client_secret'], authorization_response=response_uri, state=state)
+        # harv = OAuth2Session(config['OAuth2 Authorization Code Grant']['client_id'], state=state)
+        # token = harv.fetch_token(config['OAuth2 Authorization Code Grant']['token_url'], client_secret=config['OAuth2 Authorization Code Grant']['client_secret'], authorization_response=response_uri, state=state)
         # oauth2_serverside_token = from_dict(data_class=OAuth2_ServerSide_Token, data=token)
         # oauth2_serverside = OAuth2_ServerSide(client_id= config['OAuth2 Authorization Code Grant']['client_id'], client_secret= config['OAuth2 Authorization Code Grant']['client_secret'], token= oauth2_serverside_token, refresh_url= config['OAuth2 Authorization Code Grant']['token_url'])
         #
