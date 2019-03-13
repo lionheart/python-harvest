@@ -120,6 +120,8 @@ authorization_code_flow = OAuth2_ServerSide(client_id="CLIENT ID", client_secret
 
 You must create an OAuth2 Application in Harvest first. https://id.getharvest.com/developers
 
+Then you need to authenticate against Harvest to get your token.
+
 Token must look like this:
 
 ```python
