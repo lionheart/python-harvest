@@ -137,7 +137,8 @@ Contributions are welcome. Please submit a pull request and make sure you adhere
 ### TODOs
 
 * [ ] Tests
-* [ ] Full OAuth workflow
+* [ ] OAuth workflow refinement
+* [ ] Improve exception and error handling
 * [ ] More documentation
 
 ### License

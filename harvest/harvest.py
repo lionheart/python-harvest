@@ -13,13 +13,13 @@
 # limitations under the License.
 
 import json
-import requests
-from requests_oauthlib import OAuth2Session
 from dataclasses import asdict
 from collections import deque
 from datetime import timedelta, datetime
 import time
 
+import requests
+from requests_oauthlib import OAuth2Session
 from dacite import from_dict
 
 from .dataclasses import *
@@ -55,6 +55,9 @@ class Harvest(object):
 
         elif isinstance(auth, OAuth2_ServerSide):
             self.__headers['Authorization'] = auth.token.access_token
+
+        else:
+            raise HarvestError('Invalid authorization type "{0}".'.format(type(auth)))
 
         self.__auth = auth
         self.request_throttle = deque()

@@ -5,8 +5,10 @@ from openpyxl import utils
 
 from harvest import Harvest
 from harvest.reports import Reports
+from harvest.dataclasses import *
 
-reports = Reports("https://api.harvestapp.com/api/v2", put_auth_in_header=True, personal_token="Bearer ....", account_id=1234567890)
+personal_access_token = PersonalAccessToken('ACCOUNT ID', 'PERSONAL ACCESS TOKEN')
+reports = Reports("https://api.harvestapp.com/api/v2", personal_access_token)
 
 def get_harvest_invoices():
     wb = xw.Book.caller()

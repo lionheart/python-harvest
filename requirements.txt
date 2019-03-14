@@ -1,5 +1,5 @@
 requests
-requests_oauthlib
+requests-oauthlib
 dataclasses
 dacite
 configparser
