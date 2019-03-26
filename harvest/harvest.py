@@ -23,7 +23,7 @@ import requests
 from requests_oauthlib import OAuth2Session
 from dacite import from_dict
 
-from .dataclasses import *
+from .harvestdataclasses import *
 
 try:
     from urllib.parse import urlparse
@@ -89,7 +89,7 @@ class Harvest(object):
         if updated_since is not None:
             url = '{0}&updated_since={1}'.format(url, updated_since)
 
-        return ClientContacts.from_json(self._get(url))
+        return from_dict(data_class=ClientContacts, data=self._get(url))
 
     def get_client_contact(self, contact_id):
         return from_dict(data_class=ClientContact, data=self._get('/contacts/{0}'.format(contact_id)))

@@ -2,7 +2,7 @@
 import itertools
 
 from harvest import Harvest
-from .dataclasses import *
+from .harvestdataclasses import *
 
 class Reports(Harvest):
 
