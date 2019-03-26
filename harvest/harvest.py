@@ -17,6 +17,7 @@ from dataclasses import asdict
 from collections import deque
 from datetime import timedelta, datetime
 import time
+import copy
 
 import requests
 from requests_oauthlib import OAuth2Session
@@ -41,7 +42,10 @@ class Harvest(object):
         self.__uri = uri.rstrip('/')
         parsed = urlparse(uri)
 
-        self.__headers = {'User-Agent': 'Lionheart/python-harvest'}
+        self.__headers = {'User-Agent': 'Lionheart/python-harvest',
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        }
 
         if not (parsed.scheme and parsed.netloc):
             raise HarvestError('Invalid harvest uri "{0}".'.format(uri))
@@ -813,13 +817,14 @@ class Harvest(object):
         kwargs = {
             'method': method,
             'url': '{self.uri}{path}'.format(self=self, path=path),
-            'headers': self.__headers
+            'headers': copy.deepcopy(self.__headers)
         }
 
         if files is not None:
+            del(kwargs['headers']['Content-Type'])
             kwargs['files'] = files
-
-        if data is not None:
+            kwargs['data'] = data
+        else:
             kwargs['data'] = json.dumps(data)
 
         requestor = requests
