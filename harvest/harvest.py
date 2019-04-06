@@ -232,11 +232,12 @@ class Harvest(object):
     def get_invoice(self, invoice_id):
         return from_dict(data_class=Invoice, data=self._get('/invoices/{0}'.format(invoice_id)))
 
-    def get_invoices(self, invoice_ids):
-        returnable = []
-        for invoice_id in invoice_ids:
-            returnable.append(self.get_invoice(invoice_id))
-        return returnable
+    # This isn't part of the official API so might be best to put this in a helpers class
+    # def get_invoices(self, invoice_ids):
+    #     returnable = []
+    #     for invoice_id in invoice_ids:
+    #         returnable.append(self.get_invoice(invoice_id))
+    #     return returnable
 
     def create_invoice(self, client_id, **kwargs):
         url = '/invoices'
@@ -277,12 +278,12 @@ class Harvest(object):
 
         delete_line_item = []
         for item in line_items:
-            delete_line_item.append({'id':item.id, '_destroy':True})
+            delete_line_item.append({'id':item['id'], '_destroy':True})
 
         return from_dict(data_class=Invoice, data=self._patch(url, data={'line_items': delete_line_item}))
 
     def delete_invoice(self, invoice_id):
-        return self._delete('/invoices/{0}'.format(invoice_id))
+        self._delete('/invoices/{0}'.format(invoice_id))
 
     def invoice_item_categories(self, page=1, per_page=100, updated_since=None):
         url = '/invoice_item_categories?page={0}'.format(page)
@@ -306,7 +307,7 @@ class Harvest(object):
         return from_dict(data_class=InvoiceItemCategory, data=self._patch(url, data={'name': name}))
 
     def delete_invoice_item_category(self, invoice_category_id):
-        return self._delete('/invoice_item_categories/{0}'.format(invoice_category_id))
+        self._delete('/invoice_item_categories/{0}'.format(invoice_category_id))
 
      ## Estimates
 
@@ -400,7 +401,7 @@ class Harvest(object):
         return from_dict(data_class=Estimate, data=self._patch(url, data={'line_items': delete_line_item}))
 
     def delete_estimate(self, estimate_id):
-        return self._delete('/estimates/{0}'.format(estimate_id))
+        self._delete('/estimates/{0}'.format(estimate_id))
 
     def estimate_item_categories(self, page=1, per_page=100, updated_since=None):
         url = '/estimate_item_categories?page={0}'.format(page)
@@ -424,7 +425,7 @@ class Harvest(object):
         return from_dict(data_class=EstimateItemCategory, data=self._patch(url, data={'name': name}))
 
     def delete_estimate_item_category(self, estimate_item_id):
-        return self._delete('/estimate_item_categories/{0}'.format(estimate_item_id))
+        self._delete('/estimate_item_categories/{0}'.format(estimate_item_id))
 
     ## Expenses
 
@@ -479,7 +480,7 @@ class Harvest(object):
         return from_dict(data_class=Expense, data=response)
 
     def delete_expense(self, expense_id):
-        return self._delete('/expenses/{0}'.format(expense_id))
+        self._delete('/expenses/{0}'.format(expense_id))
 
     def expense_categories(self, page=1, per_page=100, is_active=None, updated_since=None):
         url = '/expense_categories?page={0}'.format(page)
@@ -505,7 +506,7 @@ class Harvest(object):
         return from_dict(data_class=ExpenseCategory, data=self._patch(url, data=kwargs))
 
     def delete_expense_category(self, expense_category_id):
-        return self._delete('/expense_categories/{0}'.format(expense_category_id))
+        self._delete('/expense_categories/{0}'.format(expense_category_id))
 
     ## Tasks
 
@@ -533,7 +534,7 @@ class Harvest(object):
         return from_dict(data_class=Task, data=self._patch(url, data=kwargs))
 
     def delete_task(self, task_id):
-        return self._delete('/tasks/{0}'.format(task_id))
+        self._delete('/tasks/{0}'.format(task_id))
 
     ## Time Entries
 
@@ -584,10 +585,10 @@ class Harvest(object):
         return from_dict(data_class=TimeEntry, data=self._patch(url, data=kwargs))
 
     def delete_time_entry_external_reference(self, time_entry_id):
-        return self._delete('/time_entries/{0}/external_reference'.format(time_entry_id))
+        self._delete('/time_entries/{0}/external_reference'.format(time_entry_id))
 
     def delete_time_entry(self, time_entry_id):
-        return self._delete('/time_entries/{0}'.format(time_entry_id))
+        self._delete('/time_entries/{0}'.format(time_entry_id))
 
     def restart_a_stopped_time_entry(self, time_entry_id):
         return from_dict(data_class=TimeEntry, data=self._patch('/time_entries/{0}/restart'.format(time_entry_id)))
@@ -633,7 +634,7 @@ class Harvest(object):
         return from_dict(data_class=UserAssignment, data=self._patch(url, data=kwargs))
 
     def delete_user_assignment(self, project_id, user_assignment_id):
-        return self._delete('/projects/{0}/user_assignments/{1}'.format(project_id, user_assignment_id))
+        self._delete('/projects/{0}/user_assignments/{1}'.format(project_id, user_assignment_id))
 
     def task_assignments(self, page=1, per_page=100, is_active=None, updated_since=None):
         url = '/task_assignments?page={0}'.format(page)
@@ -677,7 +678,7 @@ class Harvest(object):
         return from_dict(data_class=TaskAssignment, data=self._patch(url, data=kwargs))
 
     def delete_task_assignment(self, project_id, task_assignment_id):
-        return self._delete('/projects/{0}/task_assignments/{1}'.format(project_id, task_assignment_id))
+        self._delete('/projects/{0}/task_assignments/{1}'.format(project_id, task_assignment_id))
 
     def projects(self, page=1, per_page=100, client_id=None, is_active=None, updated_since=None):
         url = '/projects?page={0}'.format(page)
@@ -705,7 +706,7 @@ class Harvest(object):
         return from_dict(data_class=Project, data=self._patch(url, data=kwargs))
 
     def delete_project(self, project_id):
-        return self._delete('/projects/{0}'.format(project_id))
+        self._delete('/projects/{0}'.format(project_id))
 
      ## Roles
 
@@ -729,7 +730,7 @@ class Harvest(object):
         return from_dict(data_class=Role, data=self._patch(url, data=kwargs))
 
     def delete_role(self, role_id):
-        return self._delete('/roles/{0}'.format(role_id))
+        self._delete('/roles/{0}'.format(role_id))
 
      ## Users
 
@@ -797,7 +798,7 @@ class Harvest(object):
         return from_dict(data_class=User, data=self._patch(url, data=kwargs))
 
     def delete_user(self, user_id):
-        return self._delete('/users/{0}'.format(user_id))
+        self._delete('/users/{0}'.format(user_id))
 
     def _get(self, path='/', data=None):
         return self._request('GET', path, data)

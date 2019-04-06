@@ -70,8 +70,8 @@ class TestClientContacts(unittest.TestCase):
         httpretty.reset()
         httpretty.disable()
 
-    def test_client_contacts(self):
 
+    def test_client_contacts(self):
         contact_4706479_dict = {
                 "id":4706479,
                 "title":"Owner",
@@ -183,7 +183,6 @@ class TestClientContacts(unittest.TestCase):
         # delete_client_contact
         httpretty.register_uri(httpretty.DELETE,
                 "https://api.harvestapp.com/api/v2/contacts/4706510",
-                body=json.dumps(contact_4706510_dict),
                 status=200
             )
         requested_deleted_client_contact = self.harvest.delete_client_contact(contact_id=4706510)
@@ -270,6 +269,25 @@ class TestClientContacts(unittest.TestCase):
         requested_new_client = self.harvest.create_client(name= "Your New Client", currency= "EUR")
         self.assertEqual(requested_new_client, new_client)
 
+        # update_client
+        client_5737336_dict["is_active"] = False
+        httpretty.register_uri(httpretty.PATCH,
+                "https://api.harvestapp.com/api/v2/clients/5737336",
+                body=json.dumps(client_5737336_dict),
+                status=200
+            )
+        updated_client = from_dict(data_class=Client, data=client_5737336_dict)
+        requested_updated_client = self.harvest.update_client(client_id= 5737336, is_active= False)
+        self.assertEqual(requested_updated_client, updated_client)
+
+        # delete_client
+        httpretty.register_uri(httpretty.DELETE,
+                "https://api.harvestapp.com/api/v2/clients/5737336",
+                status=200
+            )
+        requested_deleted_client = self.harvest.delete_client(client_id= 5737336)
+        self.assertEqual(requested_deleted_client, None)
+
 
         httpretty.reset()
 
@@ -298,344 +316,812 @@ class TestClientContacts(unittest.TestCase):
         httpretty.register_uri(httpretty.GET, "https://api.harvestapp.com/api/v2/company", body=json.dumps(company_dict))
         requested_company = self.harvest.company()
 
-        # httpretty.last_request().body.should.equal( json.dumps(contacts_dict) )
-
         self.assertEqual(requested_company, company)
 
         httpretty.reset()
 
 
-        # company = self.harvest.company()
+    def test_invoice_messages(self):
+        invoice_message_27835209_dict = {
+                "id":27835209,
+                "sent_by":"Bob Powell",
+                "sent_by_email":"bobpowell@example.com",
+                "sent_from":"Bob Powell",
+                "sent_from_email":"bobpowell@example.com",
+                "include_link_to_client_invoice":False,
+                "send_me_a_copy":False,
+                "thank_you":False,
+                "reminder":False,
+                "send_reminder_on":None,
+                "created_at":"2017-08-23T22:15:06Z",
+                "updated_at":"2017-08-23T22:15:06Z",
+                "attach_pdf":True,
+                "event_type":None,
+                "recipients":[
+                    {
+                        "name":"Richard Roe",
+                        "email":"richardroe@example.com"
+                    }
+                ],
+                "subject":"Past due invoice reminder: #1001 from API Examples",
+                "body":"Dear Customer,\r\n\r\nThis is a friendly reminder to let you know that Invoice 1001 is 144 days past due. If you have already sent the payment, please disregard this message. If not, we would appreciate your prompt attention to this matter.\r\n\r\nThank you for your business.\r\n\r\nCheers,\r\nAPI Examples"
+            }
 
-# class TestHarvest(unittest.TestCase):
-#
-#     sample_client_a = 7439772
-#
-#     def setUp(self):
-#         config = configparser.ConfigParser()
-#         config.read('test_config.ini')
-#         #--- PERSONAL ACCESS TOKEN ---
-#         personal_access_token = PersonalAccessToken(config['PERSONAL ACCESS TOKEN']['account_id'], config['PERSONAL ACCESS TOKEN']['personal_token'])
-#         self.harvest = Helpers(config['PERSONAL ACCESS TOKEN']['uri'], personal_access_token)
-#
-#         # #--- PERSONAL ACCESS TOKEN ---
-#         # personal_access_token = PersonalAccessToken(config['PERSONAL ACCESS TOKEN']['account_id'], config['PERSONAL ACCESS TOKEN']['personal_token'])
-#         # self.harvest = harvest.Harvest(config['PERSONAL ACCESS TOKEN']['uri'], personal_access_token)
-#         # # oauth2 = OAuth2_ClientSide(config['OAuth2_Implicit_Code_Grant']['client_id'], config['OAuth2_Implicit_Code_Grant']['auth_url'])
-#
-#         # #--- CLIENT SIDE APPLICATIONS ---
-#         # mobileclient = MobileApplicationClient(client_id=config['OAuth2 Implicit Code Grant']['client_id'])
-#         #
-#         # url = mobileclient.prepare_request_uri(config['OAuth2 Implicit Code Grant']['auth_url'])
-#         # print("Browse to here and authenticate: ", url)
-#         # response_uri = input("Please put the resulting URL in here:")
-#         # # response_uri = "https://127.0.0.1:5000/callback?access_token=1387424.at.ckrsmRcPq2p7bunoRhTjmMx_bgFUslDgy-2jjfodpKXxeuXESktpZBogQBnNtO5lGBdWxnomYOfL7PLvsHQO-Q&expires_in=1209599&scope=harvest%3A1062659&token_type=bearer"
-#         # response_uri = response_uri.replace('callback?', 'callback#')
-#         # token = mobileclient.parse_request_uri_response(response_uri)
-#         # oauth2_clientside_token = from_dict(data_class=OAuth2_ClientSide_Token, data=token)
-#         #
-#         # self.harvest = harvest.Harvest(config['OAuth2 Implicit Code Grant']['uri'], oauth2_clientside_token)
-#
-#         # #--- Server SIDE APPLICATIONS ---
-#         # webclient = WebApplicationClient(client_id=config['OAuth2 Authorization Code Grant']['client_id'])
-#         # oauth = OAuth2Session(client=webclient)
-#         #
-#         # authorization_url, state = oauth.authorization_url(config['OAuth2 Authorization Code Grant']['auth_url'])
-#         # print("Browse to here and authenticate: ", authorization_url)
-#         # response_uri = input("Please put the resulting URL in here:")
-#         #
-#         # harv = OAuth2Session(config['OAuth2 Authorization Code Grant']['client_id'], state=state)
-#         # token = harv.fetch_token(config['OAuth2 Authorization Code Grant']['token_url'], client_secret=config['OAuth2 Authorization Code Grant']['client_secret'], authorization_response=response_uri, state=state)
-#         # oauth2_serverside_token = from_dict(data_class=OAuth2_ServerSide_Token, data=token)
-#         # oauth2_serverside = OAuth2_ServerSide(client_id= config['OAuth2 Authorization Code Grant']['client_id'], client_secret= config['OAuth2 Authorization Code Grant']['client_secret'], token= oauth2_serverside_token, refresh_url= config['OAuth2 Authorization Code Grant']['token_url'])
-#         #
-#         # self.harvest = harvest.Harvest(config['OAuth2 Authorization Code Grant']['uri'], oauth2_serverside)
-#
-#
-#     #
-#     # def tearDown(self):
-#     #     pass
-#     #
-#     # def test_status_not_down(self):
-#     #     self.assertEqual("none", self.harvest.status['indicator'], "Harvest API is having problems")
-#
-#
-#     # def test_OAuth2(self):
-#         # harvestapp = OAuth2Service(
-#         #     client_id='SGyrhXtLAYy0WKqtAucHKdP_',
-#         #     client_secret='JRrw_9u1MpsTxsvuQJh76TW59fjSaLnqJNu3kCXRamHpcbvtUuNXQ7MqHKB3SRaZXnfPDIBkXGaLW2vuIYGn2Q',
-#         #     name='harvetapp',
-#         #     authorize_url='https://id.getharvest.com/oauth2/authorize',
-#         #     access_token_url='https://id.getharvest.com/oauth/authorize',
-#         #     base_url='https://id.getharvest.com/')
-#         #
-#         # # https://localhost/?access_token=1387424.at.03VOq-K2U79kPJMuoU3IgdWYWN4DCqg9yZgw7Qm2WYbQuTVaJlnF6vW5Ftsian6rOBoKXNtLFaQeE29CxKpt2g&expires_in=1209599&scope=harvest%3A1062659&token_type=bearer
-#         #
-#         # access_token = 'Bearer 1387424.at.03VOq-K2U79kPJMuoU3IgdWYWN4DCqg9yZgw7Qm2WYbQuTVaJlnF6vW5Ftsian6rOBoKXNtLFaQeE29CxKpt2g'
-#         #
-#         # # return an authenticated session
-#         # session = harvestapp.get_session(access_token)
-#         # print("session", session)
-#         #
-#         # # make a request using the authenticated session
-#         # user = session.get('me')
-#         # print("user", user)
-#         #
-#         # print('Currently logged in as: {user}'.format(user=user['username']))
-#
-#     # def test_user_project_assignments(self):
-#     #     user = self.harvest.create_user('George', 'Frank', 'george@example.com')
-#     #
-#     #     user_project_assignments = self.harvest.project_assignments(user.id)
-#     #     my_project_assignments = self.harvest.my_project_assignments()
-#     #
-#     #     self.harvest.delete_user(user.id)
-#     #
-#     # def test_cost_rates(self):
-#     #     user = self.harvest.create_user('George', 'Frank', 'george@example.com')
-#     #
-#     #     user_cost_rate = self.harvest.create_user_cost_rate(user.id, 10.00)
-#     #     user_cost_rate = self.harvest.get_user_cost_rate(user.id, user_cost_rate.id)
-#     #
-#     #     cost_rates = self.harvest.user_cost_rates(user.id)
-#     #
-#     #     self.harvest.delete_user(user.id)
-#     #
-#     # def test_users(self):
-#     #     users = self.harvest.users()
-#     #
-#     #     user = self.harvest.create_user('George', 'Frank', 'george@example.com')
-#     #     self.harvest.update_user(user.id, telephone='04123456789')
-#     #     updated_user = self.harvest.get_user(user.id)
-#     #     myself = self.harvest.get_currently_authenticated_user()
-#     #
-#     #     self.harvest.delete_user(updated_user.id)
-#     #
-#     # def test_roles(self):
-#     #     user1 = self.harvest.create_user('George','Frank','george@example.com')
-#     #     user2 = self.harvest.create_user('Your','Name','yourname@example.com')
-#     #     roles = self.harvest.roles()
-#     #     new_role = self.harvest.create_role('Interface Developer', user_ids=[user1.id])
-#     #     self.harvest.update_role(new_role.id, 'Interface Developer', user_ids=[user2.id])
-#     #     updated_role = self.harvest.get_role(new_role.id)
-#     #
-#     #     self.harvest.delete_role(updated_role.id)
-#     #
-#     #     self.harvest.delete_user(user1.id)
-#     #     self.harvest.delete_user(user2.id)
-#     #
-#     # def test_project_user_assignments(self):
-#     #     user_assignments = self.harvest.user_assignments()
-#     #
-#     #     project = self.harvest.create_project(self.sample_client_a, "Your New Project", True, "Project", "project")
-#     #     user = self.harvest.create_user('George','Frank','george@example.com')
-#     #
-#     #     user_assignment = self.harvest.create_user_assignment(project.id, user.id)
-#     #     self.harvest.update_user_assignment(project.id, user_assignment.id, hourly_rate=200.00)
-#     #     updated_user_assignment = self.harvest.get_user_assignment(project.id, user_assignment.id)
-#     #
-#     #     project_user_assignments = self.harvest.project_user_assignments(project.id)
-#     #
-#     #     self.harvest.delete_user_assignment(project.id, user_assignment.id)
-#     #     self.harvest.delete_user(user.id)
-#     #     self.harvest.delete_project(project.id)
-#     #
-#     # def test_project_task_assignments(self):
-#     #     task_assignments = self.harvest.task_assignments()
-#     #
-#     #     project = self.harvest.create_project(self.sample_client_a, "Your New Project", True, "Project", "project")
-#     #     projects = self.harvest.project_task_assignments(project.id)
-#     #     new_task = self.harvest.create_task('Integrate With Harvest')
-#     #
-#     #     project_task_assignment = self.harvest.create_task_assignment(project.id, new_task.id, hourly_rate=150.00)
-#     #     task_assignment = self.harvest.get_task_assignment(project.id, project_task_assignment.id)
-#     #     updated_task_assignment = self.harvest.update_task_assignment(project.id, project_task_assignment.id, hourly_rate=100.00)
-#     #
-#     #     self.harvest.delete_task_assignment(project.id, new_task.id)
-#     #     self.harvest.delete_task(new_task.id)
-#     #     self.harvest.delete_project(project.id)
-#     #
-#     # def test_projects(self):
-#     #     projects = self.harvest.projects()
-#     #
-#     #     project = self.harvest.create_project(self.sample_client_a, "Your New Project", True, "Project", "project")
-#     #     self.harvest.update_project(project.id, budget_by='none')
-#     #     updated_project = self.harvest.get_project(project.id)
-#     #
-#     #     self.harvest.delete_project(project.id)
-#     #
-#     # def test_timesheets(self):
-#     #     project = self.harvest.create_project(self.sample_client_a, "Your New Project", True, "Project", "project")
-#     #     new_task = self.harvest.create_task('Integrate With Harvest')
-#     #     project_task_assignment = self.harvest.create_task_assignment(project.id, new_task.id, hourly_rate=150.00)
-#     #
-#     #     time_entries = self.harvest.time_entries()
-#     #
-#     #     new_time_entry = self.harvest.create_time_entry_via_duration(project.id, new_task.id, '2019-02-01', hours=7.5)
-#     #     updated_time_entry = self.harvest.update_time_entry(new_time_entry.id, hours=8.0)
-#     #     time_entry = self.harvest.get_time_entry(updated_time_entry.id)
-#     #
-#     #     # external reference currently un-tested
-#     #     # updated_time_entry = self.harvest.update_time_entry(time_entry.id, external_reference={'id': '', 'group_id': '', 'permalink': ''})
-#     #     # updated_time_entry = self.harvest.delete_time_entry_external_reference(time_entry.id)
-#     #
-#     #     self.harvest.delete_time_entry(time_entry.id)
-#     #
-#     #     running_time_entry = self.harvest.create_time_entry(project.id, new_task.id, '2019-02-01')
-#     #     running_time_entry = self.harvest.stop_a_running_time_entry(running_time_entry.id)
-#     #     running_time_entry = self.harvest.restart_a_stopped_time_entry(running_time_entry.id)
-#     #     running_time_entry = self.harvest.stop_a_running_time_entry(running_time_entry.id)
-#     #     self.harvest.delete_time_entry(running_time_entry.id)
-#     #
-#     #     self.harvest.delete_task_assignment(project.id, new_task.id)
-#     #     self.harvest.delete_project(project.id)
-#     #     self.harvest.delete_task(new_task.id)
-#     #
-#     # def test_tasks(self):
-#     #     tasks = self.harvest.tasks()
-#     #     new_task = self.harvest.create_task('Integrate With Harvest')
-#     #     task = self.harvest.get_task(new_task.id)
-#     #     updated_task = self.harvest.update_task(task.id, default_hourly_rate=100.00)
-#     #     self.harvest.delete_task(updated_task.id)
-#     #
-#     # def test_expense_categories(self):
-#     #     expense_categories = self.harvest.expense_categories()
-#     #     expense_category = self.harvest.create_expense_category('Pass Through 00', unit_name='kilograms', unit_price=10.00)
-#     #     updated_expense_category = self.harvest.update_expense_category(expense_category.id, unit_price=100.00)
-#     #     expense_category = self.harvest.get_expense_category(updated_expense_category.id)
-#     #     self.harvest.delete_expense_category(expense_category.id)
-#     #
-#     # def test_expenses(self):
-#     #     project = self.harvest.create_project(self.sample_client_a, "Your New Project", True, "Project", "project")
-#     #     expense_category = self.harvest.create_expense_category('Pass Through 00', unit_name='kilograms', unit_price=10.00)
-#     #
-#     #     expenses = self.harvest.expenses()
-#     #
-#     #     new_expense = self.harvest.create_expense(project.id, expense_category.id, '2019-01-01')
-#     #     expense = self.harvest.get_expense(new_expense.id)
-#     #     updated_expense = self.harvest.update_expense(new_expense.id, notes="This is a note on an expense.")
-#     #     self.harvest.delete_expense(updated_expense.id)
-#     #
-#     #     my_first_receipt = {'file_name':'repo-banner.png', 'content_type': 'image/png', 'files': {'receipt': ('repo-banner.png', open('repo-banner.png', 'rb'), 'image/png', {'Expires': '0'})}}
-#     #     new_expense = self.harvest.create_expense(project.id, expense_category.id, '2019-01-02', receipt=my_first_receipt)
-#     #     my_second_receipt = {'file_name':'repo-banner-bottom.png', 'content_type': 'image/png', 'files': {'receipt': ('repo-banner-bottom.png', open('repo-banner-bottom.png', 'rb'), 'image/png', {'Expires': '0'})}}
-#     #     updated_expense = self.harvest.update_expense(new_expense.id, notes="This is a note on an expense.", receipt=my_second_receipt)
-#     #
-#     #     self.harvest.delete_expense(updated_expense.id)
-#     #
-#     #     self.harvest.delete_project(project.id)
-#     #     self.harvest.delete_expense_category(expense_category.id)
-#     #
-#     # def test_estimate_item_category(self):
-#     #     estimate_item_categories = self.harvest.estimate_item_categories()
-#     #
-#     #     category = self.harvest.create_estimate_item_category('Tabasco')
-#     #     self.harvest.update_estimate_item_category(category.id, 'Pass through')
-#     #     self.harvest.delete_estimate_item_category(category.id)
-#     #
-#     # def test_estimates_messages(self):
-#     #     estimate_parameters = {"subject":"ABC Project Quote","line_items":[{"kind":"Service","description":"ABC Project Quote","unit_price":5000.0}]}
-#     #     estimate = self.harvest.create_estimate(self.sample_client_a, **estimate_parameters)
-#     #     self.harvest.create_estimate_message(estimate.id, [{'name': 'S quiggle', 'email': 'mr.squiggle@example.com'}])
-#     #
-#     #     message_parameters = {"subject":"Estimate #1001","body":"Here is our estimate.","send_me_a_copy":True}
-#     #     new_estimate_message = self.harvest.create_estimate_message(estimate.id, [{"name":"Richard Roe","email":"richardroe@example.com"}], **message_parameters)
-#     #     estimate_messages = self.harvest.estimate_messages(estimate.id)
-#     #     self.harvest.delete_estimate_message(estimate.id, new_estimate_message.id)
-#     #
-#     #     self.harvest.mark_open_estimate_as_declined(estimate.id)
-#     #
-#     # def test_estimates(self):
-#     #     estimates = self.harvest.estimates()
-#     #
-#     #     estimate_parameters = {"subject":"ABC Project Quote","line_items":[{"kind":"Service","description":"ABC Project Quote","unit_price":5000.0}]}
-#     #
-#     #     new_estimate = self.harvest.create_estimate(self.sample_client_a, **estimate_parameters)
-#     #     new_estimate = self.harvest.get_estimte(new_estimate.id)
-#     #
-#     #     updated_estimate = self.harvest.update_estimate(new_estimate.id, purchase_order="2345")
-#     #
-#     #     new_estimate_line_item = [{"kind":"Service","description":"Another Project","unit_price":1000.0}]
-#     #
-#     #     estimate_with_new_line_item = self.harvest.create_estimate_line_item(updated_estimate.id, new_estimate_line_item)
-#     #
-#     #     for item in estimate_with_new_line_item.line_items:
-#     #         updated_item = {'id':item.id, 'unit_price': 1.0}
-#     #         self.harvest.update_estimate_line_item(estimate_with_new_line_item.id, updated_item)
-#     #
-#     #     self.harvest.delete_estimate_line_items(estimate_with_new_line_item.id, estimate_with_new_line_item.line_items)
-#     #
-#     #     self.harvest.delete_estimate(estimate_with_new_line_item.id)
-#     #
-#     # def test_invoice_categories(self):
-#     #     categories = self.harvest.invoice_item_categories()
-#     #     invoice_item_category = self.harvest.create_invoice_item_category('Tabasco')
-#     #     invoice_item_category = self.harvest.get_invoice_item_category(invoice_item_category.id)
-#     #     self.harvest.update_invoice_item_category(invoice_item_category.id, 'Pass through')
-#     #     self.harvest.delete_invoice_item_category(invoice_item_category.id)
-#     #
-#     # def test_invoice_payments(self):
-#     #     invoice_config = {"subject": "ABC Project Quote", "due_date":"2017-07-27", "line_items":[{"kind":"Service","description":"ABC Project","unit_price":5000.0}]}
-#     #     invoice = self.harvest.create_invoice(self.sample_client_a, **invoice_config)
-#     #     self.harvest.mark_draft_invoice_as_sent(invoice.id)
-#     #
-#     #     payment = self.harvest.create_invoice_payment(invoice.id, 500.00, paid_date='2019-02-17', notes='This is a note')
-#     #     payments = self.harvest.invoice_payments(invoice.id)
-#     #
-#     #     self.harvest.delete_invoice_payment(invoice.id, payment.id)
-#     #     payments = self.harvest.invoice_payments(invoice.id)
-#     #     self.harvest.delete_invoice(invoice.id)
-#     #
-#     # def test_invoice_messages(self):
-#     #
-#     #     invoice_config = {"subject": "ABC Project Quote", "due_date":"2017-07-27", "line_items":[{"kind":"Service","description":"ABC Project","unit_price":5000.0}]}
-#     #     invoice = self.harvest.create_invoice(self.sample_client_a, **invoice_config)
-#     #
-#     #     new_invoice_message = self.harvest.create_invoice_message(invoice.id, [{'name': 'S quiggle', 'email': 'mr.squiggle@example.com'}], event_type='send')
-#     #
-#     #     invoice_messages = self.harvest.invoice_messages(invoice.id)
-#     #
-#     #     self.harvest.delete_invoice_message(invoice.id, new_invoice_message.id)
-#     #
-#     #     new_invoice_message = self.harvest.create_invoice_message(invoice.id, [{'name': 'S quiggle', 'email': 'mr.squiggle@example.com'}])
-#     #
-#     #     self.harvest.mark_open_invoice_as_closed(invoice.id)
-#     #     self.harvest.reopen_closed_invoice(invoice.id)
-#     #     self.harvest.mark_open_invoice_as_draft(invoice.id)
-#     #     self.harvest.mark_draft_invoice_as_sent(invoice.id)
-#     #
-#     #     self.harvest.delete_invoice(invoice.id)
-#     #
-#     # def test_invoices(self):
-#     #     original_invoices = self.harvest.invoices()
-#     #     original_invoice_count = original_invoices.total_entries
-#     #
-#     #     invoice = {"subject": "ABC Project Quote", "due_date":"2017-07-27", "line_items":[{"kind":"Service","description":"ABC Project","unit_price":5000.0}]}
-#     #     new_invoice = self.harvest.create_invoice(self.sample_client_a, **invoice)
-#     #
-#     #     invoices = self.harvest.invoices()
-#     #     invoice_count = invoices.total_entries
-#     #
-#     #
-#     #     line_items = [{"kind":"Service","description":"CBA Project","unit_price":10000.0}, {"kind":"Product","description":"CBA Project","unit_price":10000.0}]
-#     #
-#     #     self.harvest.update_invoice(new_invoice.id, subject = "CBA Project Quote")
-#     #     updated_invoice = self.harvest.update_invoice(new_invoice.id, line_items = line_items)
-#     #
-#     #     for item in updated_invoice.line_items:
-#     #         updated_item = {'id':item.id, 'unit_price': 1.0}
-#     #         self.harvest.update_invoice_line_item(updated_invoice.id, updated_item)
-#     #
-#     #     self.harvest.create_invoice_line_item(new_invoice.id, line_items)
-#     #
-#     #     error = self.harvest.create_invoice_line_item(new_invoice.id, "")
-#     #
-#     #     invoice_record = self.harvest.get_invoice(new_invoice.id)
-#     #
-#     #     self.harvest.delete_invoice_line_items(invoice_record.id, invoice_record.line_items)
-#     #
-#     #     # self.harvest.delete_invoice(invoice_record.id)
+        invoice_message_27835207_dict = {
+                "id":27835207,
+                "sent_by":"Bob Powell",
+                "sent_by_email":"bobpowell@example.com",
+                "sent_from":"Bob Powell",
+                "sent_from_email":"bobpowell@example.com",
+                "include_link_to_client_invoice":False,
+                "send_me_a_copy":True,
+                "thank_you":False,
+                "reminder":False,
+                "send_reminder_on":None,
+                "created_at":"2017-08-23T22:14:49Z",
+                "updated_at":"2017-08-23T22:14:49Z",
+                "attach_pdf":True,
+                "event_type":None,
+                "recipients":[
+                {
+                    "name":"Richard Roe",
+                    "email":"richardroe@example.com"
+                },
+                {
+                    "name":"Bob Powell",
+                    "email":"bobpowell@example.com"
+                }
+                ],
+                "subject":"Invoice #1001 from API Examples",
+                "body":"---------------------------------------------\r\nInvoice Summary\r\n---------------------------------------------\r\nInvoice ID: 1001\r\nIssue Date: 04/01/2017\r\nClient: 123 Industries\r\nP.O. Number: \r\nAmount: €288.90\r\nDue: 04/01/2017 (upon receipt)\r\n\r\nThe detailed invoice is attached as a PDF.\r\n\r\nThank you!\r\n---------------------------------------------"
+            }
 
+        invoice_message_27835324_dict = {
+                "id":27835324,
+                "sent_by":"Bob Powell",
+                "sent_by_email":"bobpowell@example.com",
+                "sent_from":"Bob Powell",
+                "sent_from_email":"bobpowell@example.com",
+                "include_link_to_client_invoice":False,
+                "send_me_a_copy":True,
+                "thank_you":False,
+                "reminder":False,
+                "send_reminder_on":None,
+                "created_at":"2017-08-23T22:25:59Z",
+                "updated_at":"2017-08-23T22:25:59Z",
+                "attach_pdf":True,
+                "event_type":None,
+                "recipients":[
+                {
+                    "name":"Richard Roe",
+                    "email":"richardroe@example.com"
+                },
+                {
+                    "name":"Bob Powell",
+                    "email":"bobpowell@example.com"
+                }
+                ],
+                "subject":"Invoice #1001",
+                "body":"The invoice is attached below."
+            }
+
+        invoice_message_27835325_dict = {
+                "id":27835325,
+                "sent_by":"Bob Powell",
+                "sent_by_email":"bobpowell@example.com",
+                "sent_from":"Bob Powell",
+                "sent_from_email":"bobpowell@example.com",
+                "include_link_to_client_invoice":False,
+                "send_me_a_copy":False,
+                "thank_you":False,
+                "reminder":False,
+                "send_reminder_on":None,
+                "created_at":"2017-08-23T22:25:59Z",
+                "updated_at":"2017-08-23T22:25:59Z",
+                "attach_pdf":False,
+                "event_type":"send",
+                "recipients":[],
+                "subject":None,
+                "body":None
+            }
+
+        invoice_message_27835326_dict = {
+                "id":27835326,
+                "sent_by":"Bob Powell",
+                "sent_by_email":"bobpowell@example.com",
+                "sent_from":"Bob Powell",
+                "sent_from_email":"bobpowell@example.com",
+                "include_link_to_client_invoice":False,
+                "send_me_a_copy":False,
+                "thank_you":False,
+                "reminder":False,
+                "send_reminder_on":None,
+                "created_at":"2017-08-23T22:25:59Z",
+                "updated_at":"2017-08-23T22:25:59Z",
+                "attach_pdf":False,
+                "event_type":"close",
+                "recipients":[],
+                "subject":None,
+                "body":None
+            }
+
+        invoice_message_27835327_dict = {
+                "id":27835327,
+                "sent_by":"Bob Powell",
+                "sent_by_email":"bobpowell@example.com",
+                "sent_from":"Bob Powell",
+                "sent_from_email":"bobpowell@example.com",
+                "include_link_to_client_invoice":False,
+                "send_me_a_copy":False,
+                "thank_you":False,
+                "reminder":False,
+                "send_reminder_on":None,
+                "created_at":"2017-08-23T22:25:59Z",
+                "updated_at":"2017-08-23T22:25:59Z",
+                "attach_pdf":False,
+                "event_type":"re-open",
+                "recipients":[],
+                "subject":None,
+                "body":None
+            }
+
+        invoice_message_27835328_dict = {
+                "id":27835328,
+                "sent_by":"Bob Powell",
+                "sent_by_email":"bobpowell@example.com",
+                "sent_from":"Bob Powell",
+                "sent_from_email":"bobpowell@example.com",
+                "include_link_to_client_invoice":False,
+                "send_me_a_copy":False,
+                "thank_you":False,
+                "reminder":False,
+                "send_reminder_on":None,
+                "created_at":"2017-08-23T22:25:59Z",
+                "updated_at":"2017-08-23T22:25:59Z",
+                "attach_pdf":False,
+                "event_type":"draft",
+                "recipients":[],
+                "subject":None,
+                "body":None
+            }
+
+        invoice_messages_dict = {
+                "invoice_messages":[invoice_message_27835209_dict, invoice_message_27835207_dict],
+                "per_page":100,
+                "total_pages":1,
+                "total_entries":2,
+                "next_page":None,
+                "previous_page":None,
+                "page":1,
+                "links":{
+                    "first":"https://api.harvestapp.com/api/v2/invoices/13150403/messages?page=1&per_page=100",
+                    "next":None,
+                    "previous":None,
+                    "last":"https://api.harvestapp.com/v2/invoices/13150403/messages?page=1&per_page=100"
+                }
+            }
+
+        # invoice_messages
+        httpretty.register_uri(httpretty.GET,
+                "https://api.harvestapp.com/api/v2/invoices/13150403/messages?page=1&per_page=100",
+                body=json.dumps(invoice_messages_dict),
+                status=200
+            )
+        invoice_messages = from_dict(data_class=InvoiceMessages, data=invoice_messages_dict)
+        requested_invoice_messages = self.harvest.invoice_messages(invoice_id= 13150403)
+        self.assertEqual(requested_invoice_messages, invoice_messages)
+
+        # create_invoice_message
+        httpretty.register_uri(httpretty.POST,
+                "https://api.harvestapp.com/api/v2/invoices/27835324/messages",
+                body=json.dumps(invoice_message_27835324_dict),
+                status=200
+            )
+        created_invoice_message = from_dict(data_class=InvoiceMessage, data=invoice_message_27835324_dict)
+        requested_created_invoice_message = self.harvest.create_invoice_message(invoice_id= 27835324, recipients= [{"name":"Richard Roe", "email":"richardroe@example.com"}], subject= "Invoice #1001", body= "The invoice is attached below.", attach_pdf= True, send_me_a_copy= True)
+        self.assertEqual(requested_created_invoice_message, created_invoice_message)
+
+        # delete_client
+        httpretty.register_uri(httpretty.DELETE,
+                "https://api.harvestapp.com/api/v2/invoices/13150403/messages/27835324",
+                status=200
+            )
+        requested_deleted_invoice_message = self.harvest.delete_invoice_message(invoice_id= 13150403, message_id= 27835324)
+        self.assertEqual(requested_deleted_invoice_message, None)
+
+        # mark_draft_invoice_as_sent
+        httpretty.register_uri(httpretty.POST,
+                "https://api.harvestapp.com/api/v2/invoices/13150403/messages",
+                body=json.dumps(invoice_message_27835325_dict),
+                status=200
+            )
+        sent_invoice_message = from_dict(data_class=InvoiceMessage, data=invoice_message_27835325_dict)
+        requested_sent_invoice_message = self.harvest.mark_draft_invoice(invoice_id= 13150403, event_type= "send")
+        self.assertEqual(requested_sent_invoice_message, sent_invoice_message)
+
+        # mark_open_invoice_as_closed
+        httpretty.register_uri(httpretty.POST,
+                "https://api.harvestapp.com/api/v2/invoices/13150403/messages",
+                body=json.dumps(invoice_message_27835326_dict),
+                status=200
+            )
+        closed_invoice_message = from_dict(data_class=InvoiceMessage, data=invoice_message_27835326_dict)
+        requested_closed_invoice_message = self.harvest.mark_draft_invoice(invoice_id= 13150403, event_type= "close")
+        self.assertEqual(requested_closed_invoice_message, closed_invoice_message)
+
+        # reopen_closed_invoice
+        httpretty.register_uri(httpretty.POST,
+                "https://api.harvestapp.com/api/v2/invoices/13150403/messages",
+                body=json.dumps(invoice_message_27835327_dict),
+                status=200
+            )
+        reopened_invoice_message = from_dict(data_class=InvoiceMessage, data=invoice_message_27835327_dict)
+        requested_reopened_invoice_message = self.harvest.mark_draft_invoice(invoice_id= 13150403, event_type= "re-open")
+        self.assertEqual(requested_reopened_invoice_message, reopened_invoice_message)
+
+        # mark_open_invoice_as_draft
+        httpretty.register_uri(httpretty.POST,
+                "https://api.harvestapp.com/api/v2/invoices/13150403/messages",
+                body=json.dumps(invoice_message_27835328_dict),
+                status=200
+            )
+        draft_invoice_message = from_dict(data_class=InvoiceMessage, data=invoice_message_27835328_dict)
+        requested_draft_invoice_message = self.harvest.mark_draft_invoice(invoice_id= 13150403, event_type= "draft")
+        self.assertEqual(requested_draft_invoice_message, draft_invoice_message)
+
+        httpretty.reset()
+
+
+    def test_invoice_messages(self):
+        invoice_payment_10112854_dict = {
+                "id": 10112854,
+                "amount": 10700.00, # TODO: this needs to be an int and have python-harvest cast it. For some reason dcite isn't listening to the cast in the constructor
+                "paid_at": "2017-02-21T00:00:00Z",
+                "paid_date": "2017-02-21",
+                "recorded_by": "Alice Doe",
+                "recorded_by_email": "alice@example.com",
+                "notes": "Paid via check #4321",
+                "transaction_id": None,
+                "created_at": "2017-06-27T16:24:57Z",
+                "updated_at": "2017-06-27T16:24:57Z",
+                "payment_gateway": {
+                        "id": 1234,
+                        "name": "Linkpoint International"
+                    }
+            }
+
+        invoice_payment_10336386_dict = {
+                "id": 10336386,
+                "amount": 1575.86,
+                "paid_at": "2017-07-24T13:32:18Z",
+                "paid_date": "2017-07-24",
+                "recorded_by": "Jane Bar",
+                "recorded_by_email": "jane@example.com",
+                "notes": "Paid by phone",
+                "transaction_id": None,
+                "created_at": "2017-07-28T14:42:44Z",
+                "updated_at": "2017-07-28T14:42:44Z",
+                "payment_gateway": {
+                        "id": None,
+                        "name": None
+                    }
+            }
+
+        invoice_payments_dict = {
+        "invoice_payments": [invoice_payment_10112854_dict],
+        "per_page": 100,
+        "total_pages": 1,
+        "total_entries": 1,
+        "next_page": None,
+        "previous_page": None,
+        "page": 1,
+        "links": {
+                "first": "https://api.harvestapp.com/v2/invoices/13150378/payments?page=1&per_page=100",
+                "next": None,
+                "previous": None,
+                "last": "https://api.harvestapp.com/v2/invoices/13150378/payments?page=1&per_page=100"
+            }
+        }
+
+        # invoice_payments
+        httpretty.register_uri(httpretty.GET,
+                "https://api.harvestapp.com/api/v2/invoices/13150403/payments?page=1&per_page=100",
+                body=json.dumps(invoice_payments_dict),
+                status=200
+            )
+        invoice_messages = from_dict(data_class=InvoicePayments, data=invoice_payments_dict)
+        requested_invoice_messages = self.harvest.invoice_payments(invoice_id= 13150403)
+        self.assertEqual(requested_invoice_messages, invoice_messages)
+
+        # create_invoice_payment
+        httpretty.register_uri(httpretty.POST,
+                "https://api.harvestapp.com/api/v2/invoices/13150378/payments",
+                body=json.dumps(invoice_payment_10336386_dict),
+                status=200
+            )
+        created_invoice_payment = from_dict(data_class=InvoicePayment, data=invoice_payment_10336386_dict)
+        requested_created_invoice_payment = self.harvest.create_invoice_payment(invoice_id= 13150378, amount= 1575.86, paid_at= "2017-07-24T13:32:18Z", notes= "Paid by phone")
+        self.assertEqual(requested_created_invoice_payment, created_invoice_payment)
+
+        # delete_invoice_payment
+        httpretty.register_uri(httpretty.DELETE,
+                "https://api.harvestapp.com/api/v2/invoices/13150403/payments/10336386",
+                status=200
+            )
+        requested_deleted_invoice_message = self.harvest.delete_invoice_payment(invoice_id= 13150403, payment_id= 10336386)
+        self.assertEqual(requested_deleted_invoice_message, None)
+
+        httpretty.reset()
+
+
+    def test_invoices(self):
+        invoice_13150403_dict = {
+                "id":13150403,
+                "client_key":"21312da13d457947a217da6775477afee8c2eba8",
+                "number":"1001",
+                "purchase_order":"",
+                "amount":288.9,
+                "due_amount":288.9,
+                "tax":5.0, # TODO: this is supposed to be an int. Something isn't casting int to float.
+                "tax_amount":13.5,
+                "tax2":2.0, # TODO: this is supposed to be an int. Something isn't casting int to float.
+                "tax2_amount":5.4,
+                "discount":10.0 , # TODO: this is supposed to be an int. Something isn't casting int to float.
+                "discount_amount":30.0, # TODO: this is supposed to be an int. Something isn't casting int to float.
+                "subject":"Online Store - Phase 1",
+                "notes":"Some notes about the invoice.",
+                "state":"open",
+                "period_start":"2017-03-01",
+                "period_end":"2017-03-01",
+                "issue_date":"2017-04-01",
+                "due_date":"2017-04-01",
+                "payment_term":"upon receipt",
+                "sent_at":"2017-08-23T22:25:59Z",
+                "paid_at":None,
+                "paid_date":None,
+                "closed_at":None,
+                "created_at":"2017-06-27T16:27:16Z",
+                "updated_at":"2017-08-23T22:25:59Z",
+                "currency":"EUR",
+                "client":{
+                        "id":5735776,
+                        "name":"123 Industries"
+                    },
+                "estimate":None,
+                "retainer":None,
+                "creator":{
+                        "id":1782884,
+                        "name":"Bob Powell"
+                    },
+                "line_items":[
+                    {
+                        "id":53341602,
+                        "kind":"Service",
+                        "description":"03/01/2017 - Project Management: [9:00am - 11:00am] Planning meetings",
+                        "quantity":2.0, # TODO: this is supposed to be an int. Something isn't casting int to float.
+                        "unit_price":100.0, # TODO: this is supposed to be an int. Something isn't casting int to float.
+                        "amount":200.0, # TODO: this is supposed to be an int. Something isn't casting int to float.
+                        "taxed":True,
+                        "taxed2":True,
+                        "project":{
+                                "id":14308069,
+                                "name":"Online Store - Phase 1",
+                                "code":"OS1"
+                            }
+                    },
+                    {
+                    "id":53341603,
+                    "kind":"Service",
+                    "description":"03/01/2017 - Programming: [1:00pm - 2:00pm] Importing products",
+                    "quantity":1.0, # TODO: this is supposed to be an int. Something isn't casting int to float.
+                    "unit_price":100.0, # TODO: this is supposed to be an int. Something isn't casting int to float.
+                    "amount":100.0, # TODO: this is supposed to be an int. Something isn't casting int to float.
+                    "taxed":True,
+                    "taxed2":True,
+                    "project":{
+                            "id":14308069,
+                            "name":"Online Store - Phase 1",
+                            "code":"OS1"
+                        }
+                    }
+                ]
+            }
+
+        invoice_13150378_dict = {
+                "id":13150378,
+                "client_key":"9e97f4a65c5b83b1fc02f54e5a41c9dc7d458542",
+                "number":"1000",
+                "purchase_order":"1234",
+                "amount":10700.0,
+                "due_amount":0.0,
+                "tax":5.0,
+                "tax_amount":500.0,
+                "tax2":2.0,
+                "tax2_amount":200.0,
+                # "discount":None, # TODO: this is supposed to be a None. Something isn't casting int to float.
+                "discount_amount":0.0,
+                "subject":"Online Store - Phase 1",
+                "notes":"Some notes about the invoice.",
+                "state":"paid",
+                "period_start":None,
+                "period_end":None,
+                "issue_date":"2017-02-01",
+                "due_date":"2017-03-03",
+                "payment_term":"custom",
+                "sent_at":"2017-02-01T07:00:00Z",
+                "paid_at":"2017-02-21T00:00:00Z",
+                "paid_date":"2017-02-21",
+                "closed_at":None,
+                "created_at":"2017-06-27T16:24:30Z",
+                "updated_at":"2017-06-27T16:24:57Z",
+                "currency":"USD",
+                "client":{
+                        "id":5735776,
+                        "name":"123 Industries"
+                    },
+                "estimate":{
+                        "id":1439814
+                    },
+                "retainer":None,
+                "creator":{
+                        "id":1782884,
+                        "name":"Bob Powell"
+                    },
+                "line_items":[
+                    {
+                        "id":53341450,
+                        "kind":"Service",
+                        "description":"50% of Phase 1 of the Online Store",
+                        "quantity":100.0,
+                        "unit_price":100.0,
+                        "amount":10000.0,
+                        "taxed":True,
+                        "taxed2":True,
+                        "project":{
+                                "id":14308069,
+                                "name":"Online Store - Phase 1",
+                                "code":"OS1"
+                            }
+                    }
+                ]
+            }
+
+        invoice_13150453_dict = {
+                "id":13150453,
+                "client_key":"8b86437630b6c260c1bfa289f0154960f83b606d",
+                "number":"1002",
+                "purchase_order":None,
+                "amount":5000.0,
+                "due_amount":5000.0,
+                "tax":None,
+                "tax_amount":0.0,
+                "tax2":None,
+                "tax2_amount":0.0,
+                "discount":None,
+                "discount_amount":0.0,
+                "subject":"ABC Project Quote",
+                "notes":None,
+                "state":"draft",
+                "period_start":None,
+                "period_end":None,
+                "issue_date":"2017-06-27",
+                "due_date":"2017-07-27",
+                "payment_term":"custom",
+                "sent_at":None,
+                "paid_at":None,
+                "paid_date":None,
+                "closed_at":None,
+                "created_at":"2017-06-27T16:34:24Z",
+                "updated_at":"2017-06-27T16:34:24Z",
+                "currency":"USD",
+                "client":{
+                        "id":5735774,
+                        "name":"ABC Corp"
+                    },
+                "estimate":None,
+                "retainer":None,
+                "creator":{
+                        "id":1782884,
+                        "name":"Bob Powell"
+                    },
+                "line_items":[
+                    {
+                        "id":53341928,
+                        "kind":"Service",
+                        "description":"ABC Project",
+                        "quantity":1.0,
+                        "unit_price":5000.0,
+                        "amount":5000.0,
+                        "taxed":False,
+                        "taxed2":False,
+                        "project":None
+                    }
+                ]
+            }
+
+        invoice_15340591_dict = {
+                "id":15340591,
+                "client_key":"16173155e0a01542b8c7f689888cb3eaeda0dc94",
+                "number":"1002",
+                "purchase_order":"",
+                "amount":333.35,
+                "due_amount":333.35,
+                "tax":None,
+                "tax_amount":0.0,
+                "tax2":None,
+                "tax2_amount":0.0,
+                "discount":None,
+                "discount_amount":0.0,
+                "subject":"ABC Project Quote",
+                "notes":"",
+                "state":"draft",
+                "period_start":"2017-03-01",
+                "period_end":"2017-03-31",
+                "issue_date":"2018-02-12",
+                "due_date":"2018-02-12",
+                "payment_term":"upon receipt",
+                "sent_at":None,
+                "paid_at":None,
+                "closed_at":None,
+                "created_at":"2018-02-12T21:02:37Z",
+                "updated_at":"2018-02-12T21:02:37Z",
+                "paid_date":None,
+                "currency":"USD",
+                "client":{
+                        "id":5735774,
+                        "name":"ABC Corp"
+                    },
+                "estimate":None,
+                "retainer":None,
+                "creator":{
+                        "id":1782884,
+                        "name":"Bob Powell"
+                    },
+                "line_items":[
+                    {
+                        "id":64957723,
+                        "kind":"Service",
+                        "description":"[MW] Marketing Website: Graphic Design (03/01/2017 - 03/31/2017)",
+                        "quantity":2.0,
+                        "unit_price":100.0,
+                        "amount":200.0,
+                        "taxed":False,
+                        "taxed2":False,
+                        "project":{
+                                "id":14307913,
+                                "name":"Marketing Website",
+                                "code":"MW"
+                            }
+                    },
+                        {
+                        "id":64957724,
+                        "kind":"Product",
+                        "description":"[MW] Marketing Website: Meals ",
+                        "quantity":1.0,
+                        "unit_price":133.35,
+                        "amount":133.35,
+                        "taxed":False,
+                        "taxed2":False,
+                        "project":{
+                                "id":14307913,
+                                "name":"Marketing Website",
+                                "code":"MW"
+                            }
+                    }
+                ]
+            }
+
+        invoices_dict = {
+                "invoices":[invoice_13150403_dict, invoice_13150378_dict],
+                "per_page":100,
+                "total_pages":1,
+                "total_entries":2,
+                "next_page":None,
+                "previous_page":None,
+                "page":1,
+                "links":{
+                        "first":"https://api.harvestapp.com/v2/invoices?page=1&per_page=100",
+                        "next":None,
+                        "previous":None,
+                        "last":"https://api.harvestapp.com/v2/invoices?page=1&per_page=100"
+                    }
+            }
+
+        # invoices
+        httpretty.register_uri(httpretty.GET,
+                "https://api.harvestapp.com/api/v2/invoices?page=1&per_page=100",
+                body=json.dumps(invoices_dict),
+                status=200
+            )
+        invoices = from_dict(data_class=Invoices, data=invoices_dict)
+        requested_invoices = self.harvest.invoices()
+        self.assertEqual(requested_invoices, invoices)
+
+        # get_invoice
+        httpretty.register_uri(httpretty.GET,
+                "https://api.harvestapp.com/api/v2/invoices/13150378",
+                body=json.dumps(invoice_13150378_dict),
+                status=200
+            )
+        invoice = from_dict(data_class=Invoice, data=invoice_13150378_dict)
+        requested_invoice = self.harvest.get_invoice(invoice_id= 13150378)
+        self.assertEqual(requested_invoice, invoice)
+
+        # create_invoice
+        httpretty.register_uri(httpretty.POST,
+                "https://api.harvestapp.com/api/v2/invoices",
+                body=json.dumps(invoice_15340591_dict),
+                status=200
+            )
+        created_invoice = from_dict(data_class=Invoice, data=invoice_15340591_dict)
+        requested_created_invoice = self.harvest.create_invoice(client_id= 5735774, subject= "ABC Project Quote", due_date= "2017-07-27", line_items= [{"kind" : "Service", "description" : "ABC Project", "unit_price" : 5000.0}])
+        self.assertEqual(requested_created_invoice, created_invoice)
+
+        # update_invoice
+        invoice_13150453_dict['purchase_order'] = "2345"
+        httpretty.register_uri(httpretty.PATCH,
+                "https://api.harvestapp.com/api/v2/invoices/13150453",
+                body=json.dumps(invoice_13150453_dict),
+                status=200
+            )
+        updated_invoice = from_dict(data_class=Invoice, data=invoice_13150453_dict)
+        requested_updated_invoice = self.harvest.update_invoice(invoice_id= 13150453, purchase_order="2345")
+        self.assertEqual(requested_created_invoice, created_invoice)
+
+
+        # create_invoice_line_item  invoice_13150453_dict
+        # https://help.getharvest.com/api-v2/invoices-api/invoices/invoices/ has an error in the doco...
+        invoice_13150453_dict['line_items'].append(
+                {
+                    "id":53341929,
+                    "kind":"Service",
+                    "description":"DEF Project",
+                    "quantity":1.0,
+                    "unit_price":1000.0,
+                    "amount":1000.0,
+                    "taxed":False,
+                    "taxed2":False,
+                    "project":None
+                }
+            )
+        httpretty.register_uri(httpretty.PATCH,
+                "https://api.harvestapp.com/api/v2/invoices/13150453",
+                body=json.dumps(invoice_13150453_dict),
+                status=200
+            )
+        updated_invoice = from_dict(data_class=Invoice, data=invoice_13150453_dict)
+        requested_updated_invoice = self.harvest.create_invoice_line_item(invoice_id= 13150453, line_items = [{"kind" : "Service", "description" : "DEF Project"," unit_price" : 1000.0}])
+        self.assertEqual(requested_created_invoice, created_invoice)
+
+        # update_invoice_line_item  invoice_13150453_dict
+        # https://help.getharvest.com/api-v2/invoices-api/invoices/invoices/ has an error in the doco...
+        invoice_13150453_dict['line_items'][1]['description'] = "ABC Project Phase 2"
+        invoice_13150453_dict['line_items'][1]['unit_price'] = 500.00
+        httpretty.register_uri(httpretty.PATCH,
+                "https://api.harvestapp.com/api/v2/invoices/13150453",
+                body=json.dumps(invoice_13150453_dict),
+                status=200
+            )
+        updated_invoice = from_dict(data_class=Invoice, data=invoice_13150453_dict)
+        requested_updated_invoice = self.harvest.update_invoice_line_item(invoice_id= 13150453, line_item = {"id":53341928,"description":"ABC Project Phase 2","unit_price":5000.0})
+        self.assertEqual(requested_created_invoice, created_invoice)
+
+        # delete_invoice_line_items
+        del(invoice_13150453_dict['line_items'][1])
+        httpretty.register_uri(httpretty.PATCH,
+                "https://api.harvestapp.com/api/v2/invoices/13150453",
+                body=json.dumps(invoice_13150453_dict),
+                status=200
+            )
+        deleted_invoice_line_items = from_dict(data_class=Invoice, data=invoice_13150453_dict)
+        requested_deleted_invoice_line_items = self.harvest.delete_invoice_line_items(invoice_id= 13150453, line_items = [{"id" : 53341928, "_destroy" : True}])
+        self.assertEqual(requested_deleted_invoice_line_items, deleted_invoice_line_items)
+
+        # delete_invoice
+        httpretty.register_uri(httpretty.DELETE,
+                "https://api.harvestapp.com/api/v2/invoices/13150453",
+                status=200
+            )
+        requested_deleted_invoice = self.harvest.delete_invoice(invoice_id= 13150453)
+        self.assertEqual(requested_deleted_invoice, None)
+
+        httpretty.reset()
+
+
+    def test_invoice_item_categories(self):
+        invoice_item_category_1466293_dict = {
+                "id":1466293,
+                "name":"Product",
+                "use_as_service":False,
+                "use_as_expense":True,
+                "created_at":"2017-06-26T20:41:00Z",
+                "updated_at":"2017-06-26T20:41:00Z"
+            }
+
+        invoice_item_category_1466292_dict = {
+                "id":1466292,
+                "name":"Service",
+                "use_as_service":True,
+                "use_as_expense":False,
+                "created_at":"2017-06-26T20:41:00Z",
+                "updated_at":"2017-06-26T20:41:00Z"
+            }
+
+        invoice_item_category_1467098_dict = {
+                "id":1467098,
+                "name":"Hosting",
+                "use_as_service":False,
+                "use_as_expense":False,
+                "created_at":"2017-06-27T16:20:59Z",
+                "updated_at":"2017-06-27T16:20:59Z"
+            }
+
+        invoice_item_categories_dict = {
+        "invoice_item_categories":[invoice_item_category_1466293_dict, invoice_item_category_1466292_dict],
+                "per_page":100,
+                "total_pages":1,
+                "total_entries":2,
+                "next_page":None,
+                "previous_page":None,
+                "page":1,
+                "links":{
+                        "first":"https://api.harvestapp.com/v2/invoice_item_categories?page=1&per_page=100",
+                        "next":None,
+                        "previous":None,
+                        "last":"https://api.harvestapp.com/v2/invoice_item_categories?page=1&per_page=100"
+                    }
+            }
+
+        # invoices
+        httpretty.register_uri(httpretty.GET,
+                "https://api.harvestapp.com/api/v2/invoice_item_categories?page=1&per_page=100",
+                body=json.dumps(invoice_item_categories_dict),
+                status=200
+            )
+        invoice_item_categories = from_dict(data_class=InvoiceItemCategories, data=invoice_item_categories_dict)
+        requested_invoice_item_categories = self.harvest.invoice_item_categories()
+        self.assertEqual(invoice_item_categories, invoice_item_categories)
+
+        # get_invoice_item_categories
+        httpretty.register_uri(httpretty.GET,
+                "https://api.harvestapp.com/api/v2/invoice_item_categories/1466293",
+                body=json.dumps(invoice_item_category_1466293_dict),
+                status=200
+            )
+        invoice_item_categories = from_dict(data_class=InvoiceItemCategory, data=invoice_item_category_1466293_dict)
+        requested_invoice_item_categories = self.harvest.get_invoice_item_category(category_id= 1466293)
+        self.assertEqual(requested_invoice_item_categories, invoice_item_categories)
+
+        # create_invoice_item_category
+        httpretty.register_uri(httpretty.POST,
+                "https://api.harvestapp.com/api/v2/invoice_item_categories",
+                body=json.dumps(invoice_item_category_1467098_dict),
+                status=200
+            )
+        created_invoice_item_category = from_dict(data_class=InvoiceItemCategory, data=invoice_item_category_1467098_dict)
+        requested_created_invoice_item_category = self.harvest.create_invoice_item_category(name= "Hosting")
+        self.assertEqual(requested_created_invoice_item_category, created_invoice_item_category)
+
+        # update_invoice_item_category
+        invoice_item_category_1467098_dict['name'] = "Expense"
+        httpretty.register_uri(httpretty.PATCH,
+                "https://api.harvestapp.com/api/v2/invoice_item_categories/1467098",
+                body=json.dumps(invoice_item_category_1467098_dict),
+                status=200
+            )
+        update_invoice_item_category = from_dict(data_class=InvoiceItemCategory, data=invoice_item_category_1467098_dict)
+        requested_update_invoice_item_category = self.harvest.update_invoice_item_category(category_id= 1467098, name= "Expense")
+        self.assertEqual(requested_update_invoice_item_category, update_invoice_item_category)
+
+        # delete_invoice_item_category
+        httpretty.register_uri(httpretty.DELETE,
+                "https://api.harvestapp.com/api/v2/invoice_item_categories/1467098",
+                status=200
+            )
+        requested_deleted_invoice_item_category = self.harvest.delete_invoice_item_category(invoice_category_id= 1467098)
+        self.assertEqual(requested_deleted_invoice_item_category, None)
+        
+        httpretty.reset()
 
 if __name__ == '__main__':
     unittest.main()

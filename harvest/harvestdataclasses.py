@@ -240,7 +240,7 @@ class Estimate:
     sent_at: Optional[str]
     accepted_at: Optional[str]
     declined_at: Optional[str]
-    line_items: List[LineItem]
+    line_items: Optional[List[LineItem]]
     notes: Optional[str]
     id: int = None
     client_key: str = None
@@ -382,6 +382,19 @@ class InvoicePayment:
     notes: str = None
     created_at: str = None
     updated_at: str = None
+
+    def __init__(self, id, amount, paid_at, paid_date, recorded_by, recorded_by_email, notes, created_at, updated_at, transaction_id = None, payment_gateway = None):
+        self.id= int(id)
+        self.amount= float(amount) # TODO: dacite (or something) isn't casting here when a dict is used in an invoice_payments
+        self.paid_at= str(paid_at)
+        self.paid_date= str(paid_date)
+        self.recorded_by= str(recorded_by)
+        self.recorded_by_email= str(recorded_by_email)
+        self.notes= str(notes)
+        self.created_at= str(created_at)
+        self.updated_at= str(updated_at)
+        self.transaction_id= transaction_id
+        self.payment_gateway= payment_gateway
 
 @dataclass
 class InvoiceItemCategory:
