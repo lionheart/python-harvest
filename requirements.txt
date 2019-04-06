@@ -3,3 +3,5 @@ requests-oauthlib
 dataclasses
 dacite
 configparser
+httpretty
+warnings
