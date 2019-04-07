@@ -732,6 +732,22 @@ class Harvest(object):
 
      ## Users
 
+    def billable_rates(self, user_id, page=1, per_page=100):
+        url = '/users/{0}/billable_rates'.format(user_id)
+        url = '{0}?page={1}'.format(url, page)
+        url = '{0}&per_page={1}'.format(url, per_page)
+
+        return from_dict(data_class=BillableRates, data=self._get(url))
+
+    def get_billable_rate(self, user_id, billable_rate_id):
+        url = '/users/{0}/billable_rates/{1}'.format(user_id, billable_rate_id)
+        return from_dict(data_class=BillableRate, data=self._get(url))
+
+    def create_billable_rate(self, user_id, amount, **kwargs):
+        url = '/users/{0}/billable_rates'.format(user_id)
+        kwargs.update({'amount': amount})
+        return from_dict(data_class=BillableRate, data=self._post(url, data=kwargs))
+
     def user_cost_rates(self, user_id, page=1, per_page=100):
         url = '/users/{0}/cost_rates'.format(user_id)
         url = '{0}?page={1}'.format(url, page)

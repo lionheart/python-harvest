@@ -3494,6 +3494,91 @@ class TestClientContacts(unittest.TestCase):
 
         httpretty.reset()
 
+    def test_billable_rates(self):
+        billable_rate_125068554_dict = {
+                "id":125068554,
+                "amount":75.0,
+                "start_date":None,
+                "end_date":"2016-12-31",
+                "created_at":"2019-06-26T22:32:52Z",
+                "updated_at":"2019-06-26T22:32:52Z"
+            }
+
+        billable_rate_125066109_dict = {
+                "id":125066109,
+                "amount":100.0,
+                "start_date":"2017-01-01",
+                "end_date":"2017-12-31",
+                "created_at":"2019-06-26T21:52:18Z",
+                "updated_at":"2019-06-26T21:52:18Z"
+            }
+
+        billable_rate_125066110_dict = {
+                "id":125066110,
+                "amount":125.0,
+                "start_date":"2018-01-01",
+                "end_date":None,
+                "created_at":"2019-06-26T21:52:18Z",
+                "updated_at":"2019-06-26T21:52:18Z"
+            }
+
+        billable_rate_125068758_dict = {
+                "id":125068758,
+                "amount":150.0,
+                "start_date":"2019-01-01",
+                "end_date":None,
+                "created_at":"2019-01-06T22:36:01Z",
+                "updated_at":"2019-01-06T22:36:01Z"
+            }
+
+        billable_rates_dict = {
+                "billable_rates":[billable_rate_125068554_dict, billable_rate_125066109_dict, billable_rate_125066110_dict],
+                "per_page":100,
+                "total_pages":1,
+                "total_entries":3,
+                "next_page":None,
+                "previous_page":None,
+                "page":1,
+                "links":{
+                        "first":"https://api.harvestapp.com/v2/users/1782974/billable_rates?page=1&per_page=100",
+                        "next":None,
+                        "previous":None,
+                        "last":"https://api.harvestapp.com/v2/users/1782974/billable_rates?page=1&per_page=100"
+                    }
+            }
+
+        # billable_rates
+        httpretty.register_uri(httpretty.GET,
+                "https://api.harvestapp.com/api/v2/users/1782974/billable_rates?page=1&per_page=100",
+                body=json.dumps(billable_rates_dict),
+                status=200
+            )
+        billable_rates = from_dict(data_class=BillableRates, data=billable_rates_dict)
+        requested_billable_rates = self.harvest.billable_rates(user_id= 1782974)
+        self.assertEqual(requested_billable_rates, billable_rates)
+
+        # get_billable_rate
+        httpretty.register_uri(httpretty.GET,
+                "https://api.harvestapp.com/api/v2/users/1782974/billable_rates/125068554",
+                body=json.dumps(billable_rate_125068554_dict),
+                status=200
+            )
+        billable_rate = from_dict(data_class=BillableRate, data=billable_rate_125068554_dict)
+        requested_billable_rate = self.harvest.get_billable_rate(user_id= 1782974, billable_rate_id= 125068554)
+        self.assertEqual(requested_billable_rate, billable_rate)
+
+        # create_billable_rate
+        httpretty.register_uri(httpretty.POST,
+                "https://api.harvestapp.com/api/v2/users/1782974/billable_rates",
+                body=json.dumps(billable_rate_125068758_dict),
+                status=201
+            )
+        created_billable_rate = from_dict(data_class=BillableRate, data=billable_rate_125068758_dict)
+        requested_created_billable_rate = self.harvest.create_billable_rate(user_id= 1782974, amount= 150.0, start_date= "2019-01-01")
+        self.assertEqual(requested_created_billable_rate, created_billable_rate)
+
+        httpretty.reset()
+
     def test_user_cost_rates(self):
         cost_rate_125068554_dict = {
                 "id":125068554,

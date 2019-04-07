@@ -549,6 +549,15 @@ class Role:
     updated_at: str = None
 
 @dataclass
+class BillableRate:
+    start_date: Optional[str]
+    end_date: Optional[str]
+    id: int = None
+    amount: float = None
+    created_at: str = None
+    updated_at: str = None
+
+@dataclass
 class CostRate:
     start_date: Optional[str]
     end_date: Optional[str]
@@ -701,6 +710,10 @@ class Projects(BasePage):
 @dataclass
 class Roles(BasePage):
     roles: List[Role] = field(init=False)
+
+@dataclass
+class BillableRates(BasePage):
+    billable_rates: List[BillableRate] = field(init=False)
 
 @dataclass
 class UserCostRates(BasePage):
