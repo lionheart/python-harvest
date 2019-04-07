@@ -8,10 +8,10 @@
 
 ### Installation
 
-Python 3 and above:
+Python 3.5 and above:
 
 ```
-pip install "python-harvest-redux>=3.7"
+pip install "python-harvest-redux>=3.5"
 ```
 
 ### Usage
@@ -135,11 +135,10 @@ implicit_code_flow_token = OAuth2_ClientSide_Token(access_token="ACCESS TOKEN", 
 Contributions are welcome. Please submit a pull request and make sure you adhere to PEP-8 coding guidelines. I'll review your patch and will accept if it looks good.
 
 ### TODOs
-
-* [ ] Tests
 * [ ] OAuth workflow refinement
 * [ ] Improve exception and error handling
 * [ ] More documentation
+* [ ] Refine tests
 
 ### License
 

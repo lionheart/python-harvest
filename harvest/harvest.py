@@ -232,13 +232,6 @@ class Harvest(object):
     def get_invoice(self, invoice_id):
         return from_dict(data_class=Invoice, data=self._get('/invoices/{0}'.format(invoice_id)))
 
-    # This isn't part of the official API so might be best to put this in a helpers class
-    # def get_invoices(self, invoice_ids):
-    #     returnable = []
-    #     for invoice_id in invoice_ids:
-    #         returnable.append(self.get_invoice(invoice_id))
-    #     return returnable
-
     def create_invoice(self, client_id, **kwargs):
         url = '/invoices'
         kwargs.update({'client_id': client_id})
@@ -564,21 +557,26 @@ class Harvest(object):
     def get_time_entry(self, time_entry_id):
         return from_dict(data_class=TimeEntry, data=self._get('/time_entries/{0}'.format(time_entry_id)))
 
-    def create_time_entry(self, project_id, task_id, spent_date, **kwargs):
-        url = '/time_entries'
-        kwargs.update({'project_id': project_id, 'task_id': task_id, 'spent_date': spent_date})
-        response = self._post(url, data=kwargs)
+    def create_time_entry(self, wants_timestamp_timers, project_id, task_id, spent_date, **kwargs):
+        company = self.company()
 
-        if 'message' in response.keys():
-            return from_dict(data_class=ErrorMessage, data=response)
+        if company.wants_timestamp_timers == wants_timestamp_timers:
+            url = '/time_entries'
+            kwargs.update({'project_id': project_id, 'task_id': task_id, 'spent_date': spent_date})
+            response = self._post(url, data=kwargs)
 
-        return from_dict(data_class=TimeEntry, data=response)
+            if 'message' in response.keys():
+                return from_dict(data_class=ErrorMessage, data=response)
+
+            return from_dict(data_class=TimeEntry, data=response)
+        else:
+            return ErrorMessage("Your user account does not have permission to create a time entry this way.")
 
     def create_time_entry_via_start_and_end_time(self, project_id, task_id, spent_date, **kwargs):
-        return self.create_time_entry(project_id, task_id, spent_date, kwargs)
+        return self.create_time_entry(True, project_id, task_id, spent_date, **kwargs)
 
     def create_time_entry_via_duration(self, project_id, task_id, spent_date, **kwargs):
-        return self.create_time_entry(project_id, task_id, spent_date, **kwargs)
+        return self.create_time_entry(False, project_id, task_id, spent_date, **kwargs)
 
     def update_time_entry(self, time_entry_id, **kwargs):
         url = '/time_entries/{0}'.format(time_entry_id)

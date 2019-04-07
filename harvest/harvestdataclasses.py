@@ -240,6 +240,7 @@ class Estimate:
     sent_at: Optional[str]
     accepted_at: Optional[str]
     declined_at: Optional[str]
+    issue_date: Optional[str]
     line_items: Optional[List[LineItem]]
     notes: Optional[str]
     id: int = None
@@ -248,7 +249,6 @@ class Estimate:
     amount: float = None
     subject: str = None
     state: str = None
-    issue_date: str = None
     due_date: str = None
     created_at: str = None
     updated_at: str = None
